@@ -14,10 +14,16 @@ from kpk_mods.constants import BUFFER_SIZE
 
 def getFileExt(f_path):
 	p = re.compile('\.([\w]+)$')
-	return p.search(str(f_path)).group(1)
+	match = p.search(str(f_path))
+	if match == None:
+		return ''
+	return match.group(1)
 
 def replaceFileExt(f_path, new_ext):
 	p = re.compile('\.[\w]+$')
+	match = p.search(str(f_path))
+	if match == None:
+		return str(f_path) + '.' + new_ext
 	return p.sub('.' + new_ext, str(f_path))
 
 def aesEncryptor(key):
