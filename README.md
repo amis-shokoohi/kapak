@@ -51,7 +51,7 @@ C:\kapak> python kapak.py -e "C:\New folder"
 C:\kapak> python kapak.py -e "C:\movie.mp4" -r
 ```
 > There is a problem with Windows that you might face with it.<br>
-> Do NOT leave \\" or \\' at the end of the path, like ~~"C:\New folder\"~~ .
+> Do NOT leave \\" or \\' at the end of the path, like ~~"C:\New folder\\"~~ .
 
 ###### Mac
 ```sh
