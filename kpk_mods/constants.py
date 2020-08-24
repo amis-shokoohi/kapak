@@ -13,9 +13,9 @@ TITLE += "\n\t▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.
 TITLE += "\n\t·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀" + "\tby " + _BY
 TITLE += "\n"
 
-DESCRYPTION =    ' Description: \tA simple-to-use file encryption script which'
-DESCRYPTION += '\n \t\tuses AES symmetric encryption methods'
-DESCRYPTION += '\n Link: \t\thttps://github.com/amis-shokoohi/kapak'
+DESCRIPTION =    ' Description: \tA simple-to-use file encryption script which'
+DESCRIPTION += '\n \t\tuses AES symmetric encryption methods'
+DESCRIPTION += '\n Link: \t\thttps://github.com/amis-shokoohi/kapak'
 
 USAGE =    ' Usage:\t\tkapak [-e -d] <path> [-r]'
 USAGE += '\n Example:\tkapak -e ./test.txt -r'
