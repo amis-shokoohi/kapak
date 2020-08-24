@@ -1,4 +1,5 @@
 from os import path, stat
+from math import ceil
 
 def getTotalSize(fList):
 	totalSize = 1
@@ -23,14 +24,12 @@ progress = [
 ]
 
 def showProgress(percentage):
-	i = int(percentage / 10)
-	if percentage >= 100:
-		i = 10
+	i = ceil(percentage / 10)
+	if percentage > 99.8:
+		print('\r [■■■■■■■■■■] 100%\n')
+		return
 
 	print('\r ' + progress[i] + ' ' + str(int(percentage)) + '%', end='')
-
-def showProgressComplete():
-	print('\r [■■■■■■■■■■] 100%\n')
 
 percentage = 0
 def calcPercentage(read_bytes, total_bytes):

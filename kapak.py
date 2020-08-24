@@ -5,7 +5,7 @@ from pathlib import Path
 
 from kpk_mods.args_parse import hasRemoveFlag, whichMode, getPath
 from kpk_mods.passwd import getPassword, deriveKey
-from kpk_mods.progress import getTotalSize, showProgressComplete
+from kpk_mods.progress import getTotalSize
 from kpk_mods.encryption import aesEncryptor, writeMeta, encryptFile
 from kpk_mods.decryption import aesDecryptor, readMeta, decryptFile
 from kpk_mods.message import printDescription, printHelp, printUsage
@@ -64,7 +64,7 @@ def start():
 
 		if mode == ENCRYPT_MODE:
 			print('\n # Encrypting...\n')
-			(key, salt) = deriveKey(password. None)
+			(key, salt) = deriveKey(password, None)
 			for f in fList:
 				(encryptor, iv) = aesEncryptor(key)
 				encryptor = writeMeta(encryptor, f, iv, salt)
@@ -106,8 +106,6 @@ def start():
 
 			if rm:
 				os.remove(p)
-
-	showProgressComplete()
 
 if __name__ == '__main__':
 	try:
