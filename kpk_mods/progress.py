@@ -1,13 +1,4 @@
-from os import path, stat
 from math import ceil
-
-def getTotalSize(fList):
-	totalSize = 1
-	for f in fList:
-		if path.isdir(f):
-			continue
-		totalSize += stat(f).st_size
-	return totalSize
 
 progress = [
 	'[□□□□□□□□□□]',

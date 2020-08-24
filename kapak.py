@@ -1,30 +1,14 @@
 import os
-import re
 from sys import argv, exit
 from pathlib import Path
 
-from kpk_mods.args_parse import hasRemoveFlag, whichMode, getPath
+from kpk_mods.arg_parse import hasRemoveFlag, whichMode, getPath
 from kpk_mods.passwd import getPassword, deriveKey
-from kpk_mods.progress import getTotalSize
 from kpk_mods.encryption import aesEncryptor, writeMeta, encryptFile
 from kpk_mods.decryption import aesDecryptor, readMeta, decryptFile
 from kpk_mods.message import printDescription, printHelp, printUsage
-from kpk_mods.constants import ENCRYPT_MODE, DECRYPT_MODE
-
-def getFilesList(dir_path, mode):
-	fList = []
-
-	if mode == ENCRYPT_MODE:
-		allFiles = list(dir_path.glob('**/*'))
-		for f in allFiles:
-			if os.path.isdir(f):
-				continue
-			if str(f)[-3:] != 'kpk':
-				fList.append(f)
-	else:
-		fList = list(dir_path.glob('**/*.kpk'))
-
-	return fList
+from kpk_mods.dir import getFilesList, getTotalSize
+from kpk_mods.constants import ENCRYPT_MODE
 
 def start():
 	# Usage message
