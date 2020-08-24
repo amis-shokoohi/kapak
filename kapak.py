@@ -17,6 +17,8 @@ def getFilesList(dir_path, mode):
 	if mode == ENCRYPT_MODE:
 		allFiles = list(dir_path.glob('**/*'))
 		for f in allFiles:
+			if os.path.isdir(f):
+				continue
 			if str(f)[-3:] != 'kpk':
 				fList.append(f)
 	else:
@@ -55,22 +57,15 @@ def start():
 		if len(fList) < 1:
 			exit('\n Error: ' + str(p) + ' is empty\n')
 
-		password = getPassword(mode)
-
-		if mode == ENCRYPT_MODE:
-			print('\n # Encrypting...\n')
-		else:
-			print('\n # Decrypting...\n')
+		password = getPassword(mode)		
 			
 		# Get total size of files in the directory
 		total_size = getTotalSize(fList)
 
 		if mode == ENCRYPT_MODE:
-			(key, salt) = deriveKey(password, None)
+			print('\n # Encrypting...\n')
+			(key, salt) = deriveKey(password. None)
 			for f in fList:
-				if os.path.isdir(f):
-					continue
-				
 				(encryptor, iv) = aesEncryptor(key)
 				encryptor = writeMeta(encryptor, f, iv, salt)
 				encryptFile(encryptor, f, total_size)
@@ -78,10 +73,8 @@ def start():
 				if rm:
 					os.remove(f)
 		else:
+			print('\n # Decrypting...\n')
 			for f in fList:
-				if os.path.isdir(f):
-					continue
-
 				(decryptor, f_out_ext) = readMeta(f, password)
 				decryptFile(decryptor, f, total_size, f_out_ext)
 
