@@ -7,7 +7,8 @@ from kpk_mods.passwd import getPassword, deriveKey
 from kpk_mods.progress import getTotalSize, showProgressComplete
 from kpk_mods.encryption import aesEncryptor, writeMeta, encryptFile
 from kpk_mods.decryption import aesDecryptor, readMeta, decryptFile
-from kpk_mods.constants import ENCRYPT_MODE, DECRYPT_MODE, TITLE, DESCRYPTION, USAGE, HELP_MESSAGE
+from kpk_mods.message import printDescription, printHelp, printUsage
+from kpk_mods.constants import ENCRYPT_MODE, DECRYPT_MODE
 
 def hasRemoveFlag(argv):
 	rm_flag = False
@@ -63,18 +64,12 @@ def getFilesList(dir_path, mode):
 def start():
 	# Usage message
 	if len(argv) == 1:
-		print(TITLE)
-		print(DESCRYPTION)
-		print(' ------------------------------')
-		print(USAGE + '\n')
+		printDescription()
 		exit()
 
 	# Help message
 	if argv[1] == '-h' or argv[1] == '--help':
-		print(TITLE)
-		print(USAGE)
-		print(' ------------------------------')
-		print(HELP_MESSAGE + '\n')
+		printHelp()
 		exit()
 
 	# Check for [-r] or [--remove] flag
@@ -82,9 +77,10 @@ def start():
 
 	mode = whichMode(argv)
 	if mode == None:
-		exit('\n' + USAGE + '\n')
+		printUsage()
+		exit()
 		
-	p= Path(getPath(argv))
+	p = Path(getPath(argv))
 	if p == None:
 		exit('\n Error: <path> variable NOT specified\n')
 	elif not os.path.exists(p):
