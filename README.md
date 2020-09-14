@@ -20,15 +20,15 @@ Make sure Python 3 is installed.
 Then install `cryptography` package with pip or any other package manager of your choice and you are good to go.
 > Currently I'm using **cryptography v2.9.2** .
 
-If you are using a _Kali_ Linux then I got you covered.
+If you are using _Kali_ Linux then I got you covered.
 Just simply run **install.sh** and it will install the script and add it to PATH so you can run it from anywhere in your system.
 ```sh
 $ cd kapak
 $ chmod +x ./install.sh
 $ ./install.sh
 ```
-> I've tested this only on Kali Linux.
-> Read the installation script before you run it on other distros.
+> I've only tested this on Kali Linux.
+> Read the installation script before running it on other distros.
 
 ### Usage
 ```sh
