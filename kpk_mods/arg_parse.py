@@ -12,7 +12,7 @@ def hasRemoveFlag(argv):
 				flag_count += 1
 
 		if flag_count < 1 or flag_count > 2:
-			exit('\n Error: Incorrect remove flag\n')
+			raise Exception('\n Error: Incorrect remove flag\n')
 
 	return rm_flag
 

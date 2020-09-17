@@ -37,7 +37,7 @@ def writeMeta(encryptor, f_in_path, iv, salt):
 
 	# Overwrite error
 	if path.exists(f_out_path):
-		exit(' Error: ' + f_out_path + ' already exists\n')
+		raise Exception(' Error: ' + f_out_path + ' already exists\n')
 
 	ext = bytes(f_in_ext, 'utf-8')
 	# strech extension to 16B

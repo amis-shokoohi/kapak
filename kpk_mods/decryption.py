@@ -1,5 +1,4 @@
 from os import stat
-from sys import exit
 from re import split
 from math import ceil
 
@@ -52,7 +51,7 @@ def decryptFile(decryptor, f_in_path, total_size, f_out_ext):
 def readMeta(f_in_path, password):
 	f_in_ext = getFileExt(f_in_path)
 	if f_in_ext != 'kpk':
-		exit(' Error: Can NOT decrypt ' + str(f_in_path) + '\n')
+		raise Exception(' Error: Can NOT decrypt ' + str(f_in_path) + '\n')
 
 	# Extract iv, salt, encrypted extension
 	f_in = open(f_in_path, 'rb')
@@ -69,7 +68,7 @@ def readMeta(f_in_path, password):
 	ext = decryptor.update(c_ext)
 
 	if len(split(b'%kapak%', ext)) < 2:
-		exit(' Error: Invalid password\n')
+		raise Exception(' Error: Invalid password\n')
 
 	f_out_ext = str(split(b'%kapak%', ext)[1], 'utf-8')
 
