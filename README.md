@@ -17,10 +17,12 @@ a given password using _AES_ symmetric encryption method.
 
 ### Installation
 Make sure Python 3 is installed.
-Then install `cryptography` package with pip or any other package manager of your choice and you are good to go.
-> Currently I'm using **cryptography v2.9.2** .
+Then run
+```
+pip install -r requirements.txt
+```
 
-If you are using _Kali_ Linux then I got you covered.
+#### If you are using _Kali_ Linux then I got you covered.
 Just simply run **install.sh** and it will install the script and add it to PATH so you can run it from anywhere in your system.
 ```sh
 $ cd kapak
@@ -74,15 +76,19 @@ $ kapak -e ~/movie.mp4 -r
 ```
 
 ### Password
-Password length: min: 3 characters, max: 1024 characters<br>
-Kapak script uses **Scrypt** key derivation methods.
+Password length:<br> 
+- min: 3 characters
+- max: 1024 characters
+
 
 After you run the script, it will prompt you to enter password.
 > Make sure to choose a strong password otherwise encryption loses its meaning.
 
+Kapak script uses **Scrypt** key derivation methods.
+
 <br>
 
-##### There is an alternative way to provide the script with a password.
+#### There is an alternative way to provide the script with a password.
 Create a file and name it `password.txt` whithin the `kapak` directory and put your password in it.
 ```sh
 $ cd kapak
