@@ -5,60 +5,69 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
 from kpk_mods.progress import showProgress, calcPercentage
-from kpk_mods.file_exntension import getFileExt, replaceFileExt
+from kpk_mods.file_exntension import fileExt, replaceFileExt
 from kpk_mods.constants import BUFFER_SIZE
 
-def encryptFile(encryptor, f_in_path, total_size):
-	f_out_path = replaceFileExt(f_in_path, 'kpk')
+class Encryptor():
+	def __init__(self, key, salt, f_in):
+		iv = urandom(16) # Generate random iv per file
+		self.encryptor = self.aesEncryptor(key, iv)
+		ext = fileExt(f_in)
 
-	with open(f_in_path, 'rb') as f_in:
-		r_byte = f_in.read(BUFFER_SIZE)
-		if len(r_byte) % 16 != 0:
-			padder = padding.PKCS7(128).padder()
-			r_byte = padder.update(r_byte) + padder.finalize()
+		meta = { 'iv': None, 'salt': None, 'c_ext': None }
+		meta['salt'] = salt
+		meta['iv'] = iv
+		meta['c_ext'] = self.encryptExt(ext)
 
-		with open(f_out_path, 'ab') as f_out:
-			while r_byte != b'':
-				w_byte = encryptor.update(r_byte)
-				f_out.write(w_byte)
+		self.f_out = replaceFileExt(f_in, 'kpk')
+		self.f_in = f_in
 
-				percentage = calcPercentage(len(r_byte), total_size)
-				showProgress(percentage)
+		# Overwrite error
+		if path.exists(self.f_out):
+			raise Exception(' Error: ' + self.f_out + ' already exists\n')
 
-				r_byte = f_in.read(BUFFER_SIZE)
-				if len(r_byte) % 16 != 0:
-					padder = padding.PKCS7(128).padder()
-					r_byte = padder.update(r_byte) + padder.finalize()
-			f_out.write(encryptor.finalize())
+		self.writeMeta(self.f_out, meta)
 
-def writeMeta(encryptor, f_in_path, iv, salt):
-	f_in_ext = getFileExt(f_in_path)
-	f_out_path = replaceFileExt(f_in_path, 'kpk')
+	def encryptFile(self, total_size):
+		with open(self.f_in, 'rb') as f_in:
+			r_byte = f_in.read(BUFFER_SIZE)
+			if len(r_byte) % 16 != 0:
+				padder = padding.PKCS7(128).padder()
+				r_byte = padder.update(r_byte) + padder.finalize()
 
-	# Overwrite error
-	if path.exists(f_out_path):
-		raise Exception(' Error: ' + f_out_path + ' already exists\n')
+			with open(self.f_out, 'ab') as f_out:
+				while r_byte != b'':
+					w_byte = self.encryptor.update(r_byte)
+					f_out.write(w_byte)
 
-	ext = bytes(f_in_ext, 'utf-8')
-	# strech extension to 16B
-	if len(ext) < 16:
-		ext = urandom(9 - len(ext)) + b'%kapak%' + ext
-	c_ext = encryptor.update(ext)
+					percentage = calcPercentage(len(r_byte), total_size)
+					showProgress(percentage)
 
-	# Write iv, salt, encrypted extension to first 48B of the output file
-	f_out = open(f_out_path, 'wb')
-	f_out.write(iv)
-	f_out.write(salt)
-	f_out.write(c_ext)
-	f_out.close()
+					r_byte = f_in.read(BUFFER_SIZE)
+					if len(r_byte) % 16 != 0:
+						padder = padding.PKCS7(128).padder()
+						r_byte = padder.update(r_byte) + padder.finalize()
+				f_out.write(self.encryptor.finalize())
 
-	return encryptor
+	def encryptExt(self, ext):
+		ext = bytes(ext, 'utf-8')
+		# Strech extension to 16B
+		if len(ext) < 16:
+			ext = urandom(9 - len(ext)) + b'%kapak%' + ext
+		return self.encryptor.update(ext)
 
-def aesEncryptor(key):
-	iv = urandom(16) # Generate random iv per file
-	cipher = Cipher(
-		algorithms.AES(key), 
-		modes.CBC(iv), 
-		backend=default_backend()
-	)
-	return (cipher.encryptor(), iv)
+	def writeMeta(self, f_out_path, meta):
+		# Write iv, salt, encrypted extension to first 48B of the output file
+		f_out = open(f_out_path, 'wb')
+		f_out.write(meta['iv'])
+		f_out.write(meta['salt'])
+		f_out.write(meta['c_ext'])
+		f_out.close()
+
+	def aesEncryptor(self, key, iv):
+		cipher = Cipher(
+			algorithms.AES(key), 
+			modes.CBC(iv), 
+			backend=default_backend()
+		)
+		return cipher.encryptor()
