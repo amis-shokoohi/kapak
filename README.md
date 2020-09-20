@@ -83,12 +83,12 @@ After you run the script, it will prompt you to enter password.
 <br>
 
 ##### There is an alternative way to provide the script with a password.
-Create a file and name it `p.dat` whithin the `kapak` directory and put your password in it.
+Create a file and name it `password.txt` whithin the `kapak` directory and put your password in it.
 ```sh
 $ cd kapak
-$ echo 'My$tr0n9P@ssw0rD' > p.dat
+$ echo 'My$tr0n9P@ssw0rD' > password.txt
 ```
-After you run the script, it will consume the `p.dat` file and will remove it after the operation is completed.
+After you run the script, it will consume the `password.txt` file and will remove it after the operation is completed.
 
 ### Contribute
 Feel free to contribute however you want.

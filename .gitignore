@@ -3,3 +3,4 @@ test.*
 TEST/
 **/__pycache__/
 todo.*
+password.txt

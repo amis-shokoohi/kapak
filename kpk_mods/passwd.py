@@ -29,11 +29,12 @@ def isCorrectPassLength(password):
 def getPassword(mode):
 	password = None
 	# Read the password from p.dat file
-	if path.exists('p.dat'):
-		pFile = open('p.dat', 'r')
+	f = 'password.txt'
+	if path.exists(f):
+		pFile = open(f, 'r')
 		password = pFile.read()
 		pFile.close()
-		remove('p.dat')
+		remove(f)
 	# Prompt user for the password
 	else:
 		password = askPass(mode)
