@@ -58,11 +58,11 @@ class Decryptor():
 				f_out.write(self.decryptor.finalize())
 
 	def decryptExt(self, c_ext):
-		ext = self.decryptor.update(c_ext)
-		if len(split(b'%kapak%', ext)) < 2:
+		s = split(b'%kpk%', self.decryptor.update(c_ext))
+		if len(s) < 2:
 			raise Exception(' Error: Invalid password\n')
-		f_out_ext = str(split(b'%kapak%', ext)[1], 'utf-8')
-		return f_out_ext
+		ext = str(s[1], 'utf-8')
+		return ext
 
 	def readMeta(self, f_in_path):
 		# Extract iv, salt, encrypted extension
