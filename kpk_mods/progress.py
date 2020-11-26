@@ -15,12 +15,13 @@ progress = [
 ]
 
 def showProgress(percentage):
+	eraser = '\r' + 20*' '
 	i = ceil(percentage / 10)
 	if percentage > 99.8:
-		print('\r [■■■■■■■■■■] 100%\n')
+		print(eraser + '\r [■■■■■■■■■■] 100%\n')
 		return
 
-	print('\r ' + progress[i] + ' ' + str(int(percentage)) + '%', end='')
+	print(eraser + '\r ' + progress[i] + ' ' + str(int(percentage)) + '%', end='')
 
 percentage = 0
 def calcPercentage(read_bytes, total_bytes):

@@ -93,4 +93,5 @@ if __name__ == '__main__':
 	except KeyboardInterrupt:
 		exit()
 	except Exception as err:
-		exit(err)
+		print('\r', err)
+		exit()
