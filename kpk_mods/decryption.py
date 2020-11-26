@@ -58,11 +58,28 @@ class Decryptor():
 				f_out.write(self.decryptor.finalize())
 
 	def decryptExt(self, c_ext):
-		s = split(b'%kpk%', self.decryptor.update(c_ext))
-		if len(s) < 2:
+		# 16B: length(2B) + ext(?) + pad(?) + b'kpk'(3B). e.g. 03txtpppppppkpk
+		ext = self.decryptor.update(c_ext)
+
+		if ext[13:16] != b'kpk': # Wrong Password
+			# Backward Compatible code
+			# For encrypted files with version <=v2.0.1
+			def oldDecryptExt(ext):
+				# 16B: pad(?) + b'%kpk%'(5B) + ext(?). e.g. pppppppp%kpk%txt
+				# b'%kpk%' might not be a good seperator
+				s = split(b'%kpk%', ext)
+				if len(s) < 2:
+					raise Exception(' Error: Invalid password\n')
+				return str(s[1], 'utf-8')
+			return oldDecryptExt(ext)
+
+		ext_length = None
+		try:
+			ext_length = int(ext[:2])
+		except ValueError:
 			raise Exception(' Error: Invalid password\n')
-		ext = str(s[1], 'utf-8')
-		return ext
+
+		return str(ext[2:2 + ext_length], 'utf-8')
 
 	def readMeta(self, f_in_path):
 		# Extract iv, salt, encrypted extension

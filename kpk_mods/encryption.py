@@ -51,10 +51,18 @@ class Encryptor():
 
 	def encryptExt(self, ext):
 		ext = bytes(ext, 'utf-8')
-		if len(ext) > 11:
+		ext_length = len(ext)
+		if ext_length > 11:
 			raise Exception(' Error: Unable to encrypt files with extension longer than 11B\n')
+
 		# Strech extension to 16B
-		ext = urandom(11 - len(ext)) + b'%kpk%' + ext
+		pad = urandom(11 - ext_length)
+		if ext_length < 9:
+			ext_length = bytes('0' + str(ext_length), 'utf-8')
+		else:
+			ext_length = bytes(str(ext_length), 'utf-8')
+		ext = ext_length + ext + pad + b'kpk'
+		
 		return self.encryptor.update(ext)
 
 	def writeMeta(self, f_out_path, meta):
