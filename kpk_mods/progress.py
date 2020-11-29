@@ -1,4 +1,4 @@
-from math import ceil
+from math import ceil, floor
 
 progress = [
 	'[□□□□□□□□□□]',
@@ -15,13 +15,10 @@ progress = [
 ]
 
 def showProgress(percentage):
+	percentage = ceil(percentage)
+	i = floor(percentage / 10)
 	eraser = '\r' + 20*' '
-	i = ceil(percentage / 10)
-	if percentage > 99.8:
-		print(eraser + '\r [■■■■■■■■■■] 100%\n')
-		return
-
-	print(eraser + '\r ' + progress[i] + ' ' + str(int(percentage)) + '%', end='')
+	print(eraser + '\r ' + progress[i] + ' ' + str(percentage) + '%', end='')
 
 percentage = 0
 def calcPercentage(read_bytes, total_bytes):
