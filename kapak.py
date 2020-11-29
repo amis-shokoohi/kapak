@@ -44,7 +44,7 @@ def start():
 		target_size = os.stat(target_path).st_size
 
 		if mode == ENCRYPT_MODE:
-			print('\n # Encrypting...\n')
+			print('\n Encrypting...\n')
 			(key, salt) = deriveKey(password, None)
 			encryptor = Encryptor(key, salt, target_path)
 			encryptor.encryptFile(target_size)
@@ -52,7 +52,7 @@ def start():
 				os.remove(target_path)
 			return
 
-		print('\n # Decrypting...\n')
+		print('\n Decrypting...\n')
 		decryptor = Decryptor(password, target_path)
 		decryptor.decryptFile(target_size)
 		if rm:
@@ -71,7 +71,7 @@ def start():
 	total_size = calcTotalSize(ff)
 
 	if mode == ENCRYPT_MODE:
-		print('\n # Encrypting...\n')
+		print('\n Encrypting...\n')
 		(key, salt) = deriveKey(password, None)
 		for f in ff:
 			encryptor = Encryptor(key, salt, f)
@@ -80,7 +80,7 @@ def start():
 				os.remove(f)
 		return
 
-	print('\n # Decrypting...\n')
+	print('\n Decrypting...\n')
 	for f in ff:
 		decryptor = Decryptor(password, f)
 		decryptor.decryptFile(total_size)
@@ -93,5 +93,5 @@ if __name__ == '__main__':
 	except KeyboardInterrupt:
 		exit()
 	except Exception as err:
-		print('\r', err)
-		exit()
+		print('\r' + str(err))
+		exit(1)
