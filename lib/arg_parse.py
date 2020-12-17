@@ -1,6 +1,6 @@
 from sys import argv
 
-from kpk_mods.constants import ENCRYPT_MODE, DECRYPT_MODE
+from lib.constants import ENCRYPT_MODE, DECRYPT_MODE
 
 def hasRemoveFlag(argv):
 	rm_flag = False

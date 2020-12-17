@@ -2,14 +2,14 @@ import os
 from sys import argv, exit
 from pathlib import Path
 
-from kpk_mods.arg_parse import hasRemoveFlag, whichMode, getPath
-from kpk_mods.passwd import getPassword, deriveKey
-from kpk_mods.decryption import Decryptor
-from kpk_mods.encryption import Encryptor
-from kpk_mods.message import printDescription, printHelp, printUsage
-from kpk_mods.dir import files, calcTotalSize
-from kpk_mods.constants import ENCRYPT_MODE
-from kpk_mods.file_exntension import validateFileByExt
+from lib.arg_parse import hasRemoveFlag, whichMode, getPath
+from lib.passwd import getPassword, deriveKey
+from lib.decryption import Decryptor
+from lib.encryption import Encryptor
+from lib.message import printDescription, printHelp, printUsage
+from lib.dir import files, calcTotalSize
+from lib.constants import ENCRYPT_MODE
+from lib.file_exntension import validateFileByExt
 
 def start():
 	# Usage message
@@ -50,6 +50,7 @@ def start():
 			encryptor.encryptFile(target_size)
 			if rm:
 				os.remove(target_path)
+			print('\r' + 20*' ' + '\r [■■■■■■■■■■] 100%') # TODO: This is a hack, should be fixed in progress.py
 			return
 
 		print('\n Decrypting...\n')
@@ -57,6 +58,7 @@ def start():
 		decryptor.decryptFile(target_size)
 		if rm:
 			os.remove(target_path)
+		print('\r' + 20*' ' + '\r [■■■■■■■■■■] 100%') # TODO: This is a hack, should be fixed in progress.py
 		return
 
 	# If directory
@@ -78,6 +80,7 @@ def start():
 			encryptor.encryptFile(total_size)
 			if rm:
 				os.remove(f)
+		print('\r' + 20*' ' + '\r [■■■■■■■■■■] 100%') # TODO: This is a hack, should be fixed in progress.py
 		return
 
 	print('\n Decrypting...\n')
@@ -86,6 +89,7 @@ def start():
 		decryptor.decryptFile(total_size)
 		if rm:
 			os.remove(f)
+	print('\r' + 20*' ' + '\r [■■■■■■■■■■] 100%') # TODO: This is a hack, should be fixed in progress.py
 
 if __name__ == '__main__':
 	try:

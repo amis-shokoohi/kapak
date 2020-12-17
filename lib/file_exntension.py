@@ -1,6 +1,6 @@
 import re
 
-from kpk_mods.constants import ENCRYPT_MODE, DECRYPT_MODE
+from lib.constants import ENCRYPT_MODE, DECRYPT_MODE
 
 def fileExt(f_path):
 	p = re.compile('\.([\w]+)$')

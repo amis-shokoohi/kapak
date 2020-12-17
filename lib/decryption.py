@@ -6,10 +6,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
-from kpk_mods.passwd import deriveKey
-from kpk_mods.progress import showProgress, calcPercentage
-from kpk_mods.file_exntension import replaceFileExt
-from kpk_mods.constants import BUFFER_SIZE
+from lib.passwd import deriveKey
+from lib.progress import showProgress, calcPercentage
+from lib.file_exntension import replaceFileExt
+from lib.constants import BUFFER_SIZE
 
 class Decryptor():
 	def __init__(self, password, f_in):

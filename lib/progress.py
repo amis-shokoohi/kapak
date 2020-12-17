@@ -23,5 +23,6 @@ def showProgress(percentage):
 percentage = 0
 def calcPercentage(read_bytes, total_bytes):
 	global percentage
-	percentage += read_bytes * 100 / total_bytes
+	p = read_bytes / total_bytes
+	percentage += p * 100 if p <= 1 else 100
 	return percentage

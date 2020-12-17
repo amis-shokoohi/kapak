@@ -4,7 +4,7 @@ from getpass import getpass
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.backends import default_backend
 
-from kpk_mods.constants import ENCRYPT_MODE
+from lib.constants import ENCRYPT_MODE
 
 def askPass(mode):
 	password1 = getpass(' Enter password: ')

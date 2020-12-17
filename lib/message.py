@@ -1,4 +1,4 @@
-from kpk_mods.constants import USAGE, TITLE, HELP_MESSAGE, DESCRIPTION
+from lib.constants import USAGE, TITLE, HELP_MESSAGE, DESCRIPTION
 
 def printDescription():
 	print(TITLE)

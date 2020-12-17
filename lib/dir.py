@@ -1,7 +1,7 @@
 from os import path, stat
 
-from kpk_mods.constants import ENCRYPT_MODE
-from kpk_mods.file_exntension import fileExt
+from lib.constants import ENCRYPT_MODE
+from lib.file_exntension import fileExt
 
 def calcTotalSize(files):
 	totalSize = 1

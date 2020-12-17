@@ -1,6 +1,8 @@
 .vscode/
 test.*
 TEST/
+test*
 **/__pycache__/
 todo.*
 password.txt
+build-script
