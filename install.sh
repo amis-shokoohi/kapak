@@ -1,59 +1,45 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
-echo '#! /usr/bin/env python' > kapak
+echo '#! /usr/bin/env python3' > kapak
 cat ./kapak.py >> kapak
 
 CURRENT_DIR=$(pwd)
+ROOT_DIR=/root/kapak
+BIN_DIR=/bin/kapak
 
-if [[ "$CURRENT_DIR" != "/root/kapak" ]]; then
-	if [[ -d /root/kapak ]]; then
-		rm -r /root/kapak
+if [[ $CURRENT_DIR != $ROOT_DIR ]]; then
+	if [[ -d $ROOT_DIR ]]; then
+		rm -rf $ROOT_DIR
 	fi
 
-	mkdir /root/kapak
-	cp -r "$CURRENT_DIR"/* /root/kapak
-
-	echo -e "\nFixing permissions..."
-	sleep 1
-	chmod +x /root/kapak/install.sh
-	chmod +x /root/kapak/kapak
-
-	if [[ -d /bin/kapak ]]; then
-		rm -r /bin/kapak
-	fi
-
-	mkdir /bin/kapak
-
-	echo "Copying script to /bin/kapak..."
-	sleep 1
-	cp -r /root/kapak/* /bin/kapak
-
-	rm -r /root/kapak	
-
-	echo "Adding kapak script to PATH..."
-	sleep 1
-	export PATH=/bin/kapak:$PATH
-	echo "export PATH=/bin/kapak:$PATH" >> ~/.bashrc
-elif [[ "$CURRENT_DIR" == "/root/kapak" ]]; then
-	echo -e "\nFixing permissions..."
-	sleep 1
-	chmod +x /root/kapak/install.sh
-	chmod +x /root/kapak/kapak
-
-	if [[ -d /bin/kapak ]]; then
-		rm -r /bin/kapak
-	fi
-
-	mkdir /bin/kapak
-
-	echo "Copying script to /bin/kapak..."
-	sleep 1
-	cp -r /root/kapak/* /bin/kapak
-
-	echo "Adding kapak script to PATH..."
-	sleep 1
-	export PATH=/bin/kapak:$PATH
-	echo "export PATH=/bin/kapak:$PATH" >> ~/.bashrc
+	mkdir $ROOT_DIR
+	cp -r ${CURRENT_DIR}/* $ROOT_DIR
+	cd $ROOT_DIR
 fi
+
+echo -e "\nFixing permissions..."
+sleep 2
+chmod +x ${ROOT_DIR}/install.sh
+chmod +x ${ROOT_DIR}/kapak
+
+if [[ -d $BIN_DIR ]]; then
+	rm -rf $BIN_DIR
+fi
+
+mkdir $BIN_DIR
+
+echo "Copying files to $BIN_DIR..."
+sleep 2
+cp -r ${ROOT_DIR}/* $BIN_DIR
+if [[ -f ${BIN_DIR}/kapak.py ]]; then
+	rm ${BIN_DIR}/kapak.py
+fi
+
+rm -rf $ROOT_DIR
+
+echo "Adding kapak script to PATH..."
+sleep 2
+export PATH=${BIN_DIR}:$PATH
+echo "export PATH=${BIN_DIR}:$PATH" >> ~/.bashrc
 echo "Done"
 echo -e '\nOpen another terminal and type "kapak"\n'

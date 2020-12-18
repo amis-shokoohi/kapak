@@ -28,7 +28,7 @@ def isCorrectPassLength(password):
 
 def getPassword(mode):
 	password = None
-	# Read the password from p.dat file
+	# Read the password from password.txt file
 	f = 'password.txt'
 	if path.exists(f):
 		pFile = open(f, 'r')

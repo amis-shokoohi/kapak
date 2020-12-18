@@ -16,24 +16,28 @@ a given password using _AES_ symmetric encryption method.
 - [contribute](#Contribute)
 
 ### Installation
-Make sure Python 3 is installed.
-Then run
-```
-pip install -r requirements.txt
-```
+#### Linux
+>Make sure Python 3 is installed.
 
-#### If you are using _Kali_ Linux then I got you covered.
-Just simply run **install.sh** and it will install the script and add it to PATH so you can run it from anywhere in your system.
-```sh
+Install requirements:
+```
+$ pip install -r requirements.txt
+```
+Then run the installation script as **root** user. It will copy files into `/bin/kapak` directory and add it to the `PATH`:
+```
 $ cd kapak
 $ chmod +x ./install.sh
-$ ./install.sh
+$ sudo ./install.sh
 ```
-> I've only tested this on Kali Linux.
-> Read the installation script before running it on other distros.
+> NOTE: I've only tested this on Debian based distros.
+#### Windows
+Download zipfile from [here](https://github.com/amis-shokoohi/kapak/archive/kapak.zip).<br>
+You can use `kapak.exe` now, but if you want to run it from anywhere in your system, follow instruction below:
+- Right click on `install.cmd` and click on `Run as administrator`.
+- Open Windows search bar and search for `var`. Click on `Edit the system environment variables`. Click on `Environment Variables...`. In `User variables` section look for `Path`, choose it and hit the `Edit...` button. Click on `New` and paste `C:\PROGRA~1\kapak`. Click `OK` `OK` `OK`, and you're done. Open a terminal an type `kapak`, you should be able to see its logo.
 
 ### Usage
-```sh
+```
 $ kapak [-e -d] <path> -r
 $ kapak -e ./test.txt -r
 ```
@@ -42,51 +46,32 @@ $ kapak -e ./test.txt -r
 For help use `-h` or `--help` flag.<br>
 For encryption mode use `-e` or `--encrypt` flag.<br>
 For decryption mode use `-d` or `--decrypt` flag.<br>
-If you want to remove the target files after the process then use `-r` or `--remove` flag.
+If you want to remove the target files after the process, use `-r` or `--remove` flag.
 
 ### Examples
 
-###### Windows
+#### Linux
+```
+$ kapak -e ~/new-dir
+$ kapak -e ~/movie.mp4 -r
+$ kapak -d ~/movie.kpk -r
+```
+
+#### Windows
 ```sh
-C:\> cd kapak
-C:\kapak> python kapak.py -e "C:\New folder"
-C:\kapak> python kapak.py -e "C:\movie.mp4" -r
+C:\> kapak -e "C:\New folder"
+C:\> kapak -e "C:\movie.mp4" -r
+C:\> kapak -d "C:\movie.kpk" -r
 ```
 > There is a problem with Windows that you might face with it.<br>
 > Do NOT leave \\" or \\' at the end of the path, like ~~"C:\New folder\\"~~ .
-
-###### Mac
-```sh
-$ cd kapak
-$ python3 kapak.py -e ~/new-dir
-$ python3 kapak.py -e ~/movie.mp4 -r
-```
-
-###### Linux
-```sh
-$ cd kapak
-$ python3 kapak.py -e ~/new-dir
-$ python3 kapak.py -e ~/movie.mp4 -r
-```
-
-###### If you installed the script with "install.sh"
-```sh
-$ kapak -e ~/new-dir
-$ kapak -e ~/movie.mp4 -r
-```
 
 ### Password
 Password length:<br> 
 - min: 3 characters
 - max: 1024 characters
 
-
-After you run the script, it will prompt you to enter password.
-> Make sure to choose a strong password otherwise encryption loses its meaning.
-
-Kapak script uses **Scrypt** key derivation methods.
-
-<br>
+After you run the script, it will prompt you to enter password.<br>
 
 #### There is an alternative way to provide the script with a password.
 Create a file and name it `password.txt` whithin the `kapak` directory and put your password in it.

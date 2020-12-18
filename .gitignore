@@ -5,4 +5,4 @@ test*
 **/__pycache__/
 todo.*
 password.txt
-build-script
+build-windows
