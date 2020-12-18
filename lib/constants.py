@@ -3,7 +3,7 @@ BUFFER_SIZE = 64 * 1024 * 1024 # 64MB
 ENCRYPT_MODE = 1
 DECRYPT_MODE = 2
 
-_VERSION = 'v2.0.3'
+_VERSION = 'v2.1.0'
 _BY = 'Amis Shokoohi'
 
 TITLE =  "\n\t▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ "
