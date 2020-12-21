@@ -4,7 +4,7 @@ TEMP_ZIP_EXT = 'kpktempzip'
 ENCRYPT_MODE = 1
 DECRYPT_MODE = 2
 
-_VERSION = 'v2.1.0'
+_VERSION = 'v2.2.0'
 _BY = 'Amis Shokoohi'
 
 TITLE =  "\n\t▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ "

@@ -31,7 +31,7 @@ $ sudo ./install.sh
 ```
 > NOTE: I've only tested this on Debian based distros.
 #### Windows
-Download zipfile from [here](https://github.com/amis-shokoohi/kapak/releases/download/v2.1.0/kapak-windows-v2.1.0.zip).<br>
+Download zipfile from [here](https://github.com/amis-shokoohi/kapak/releases/download/v2.2.0/kapak-windows-v2.2.0.zip).<br>
 You can use `kapak.exe` now, but if you want to run it from anywhere in your system, follow instruction below:
 - Right click on `install.cmd` and click on `Run as administrator`.
 - Open Windows search bar and search for `var`. Click on `Edit the system environment variables`. Click on `Environment Variables...`. In `User variables` section look for `Path`, choose it and hit the `Edit...` button. Click on `New` and paste `C:\PROGRA~1\kapak`. Click `OK` `OK` `OK`, and you're done. Open a terminal an type `kapak`, you should be able to see its logo.
