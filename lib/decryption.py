@@ -16,8 +16,8 @@ class Decryptor():
 		meta = self.readMeta(f_in)
 		(key, _) = deriveKey(password, meta['salt'])
 		self.decryptor = self.aesDecryptor(key, meta['iv'])
-		f_out_ext = self.decryptExt(meta['c_ext'])
-		self.f_out = replaceFileExt(f_in, f_out_ext)
+		self.f_out_ext = self.decryptExt(meta['c_ext'])
+		self.f_out = replaceFileExt(f_in, self.f_out_ext)
 		self.f_in = f_in
 		self.f_in_size = stat(f_in).st_size - 48
 
@@ -58,7 +58,7 @@ class Decryptor():
 				f_out.write(self.decryptor.finalize())
 
 	def decryptExt(self, c_ext):
-		# 16B: length(2B) + ext(?) + pad(?) + b'kpk'(3B). e.g. 03txtpppppppkpk
+		# 16B: length(2B) + ext(?) + pad(?) + b'kpk'(3B). e.g. 03txtppppppppkpk
 		ext = self.decryptor.update(c_ext)
 
 		if ext[13:16] != b'kpk': # Wrong Password
@@ -101,3 +101,9 @@ class Decryptor():
 			backend=default_backend()
 		)
 		return cipher.decryptor()
+
+	def getDecryptedFileName(self):
+		return self.f_out
+
+	def getDecryptedFileExt(self):
+		return self.f_out_ext
