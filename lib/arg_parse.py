@@ -1,41 +1,40 @@
 from sys import argv
+from pathlib import Path
 
-from lib.constants import ENCRYPT_MODE, DECRYPT_MODE
+from lib.constants import ENCRYPT_MODE, DECRYPT_MODE, USAGE
 
-def hasRemoveFlag(argv):
-	rm_flag = False
+def hasFlag(flag_name, argv, arg_count_min, arg_count_max):
+	flag_exists = False
 	flag_count = 0
-	if len(argv) == 4:
+	l = len(argv)
+	if l >= arg_count_min or l <= arg_count_max:
 		for v in argv[1:]:
-			if v == '-r' or v == '--remove':
-				rm_flag = True
-				flag_count += 1
-
-		if flag_count < 1 or flag_count > 2:
-			raise Exception('\n Error: Incorrect remove flag\n')
-
-	return rm_flag
-
-def whichMode(argv):
-	mode_flag = None
-	flag_count = 0
-	if len(argv) == 3 or len(argv) == 4:
-		for v in argv[1:]:
-			if v == '-e' or v == '--encrypt':
-				mode_flag = ENCRYPT_MODE
-				flag_count += 1
-			elif v == '-d' or v == '--decrypt':
-				mode_flag = DECRYPT_MODE
+			if v == '-'+flag_name[0] or v == '--'+flag_name:
+				flag_exists = True
 				flag_count += 1
 
 		if flag_count > 1:
-			mode_flag = None
+			raise Exception(USAGE)
 
-	return mode_flag
+	return flag_exists
+
+def hasRemoveFlag(argv):
+	return hasFlag('remove', argv, 4, 5)
+
+def hasZipFlag(argv):
+	return hasFlag('zip', argv, 4, 5)
+
+def whichMode(argv):
+	e = hasFlag('encrypt', argv, 3, 4)
+	d = hasFlag('decrypt', argv, 3, 5)
+	if not e ^ d:
+		raise Exception(USAGE)
+	return ENCRYPT_MODE if e else DECRYPT_MODE
 
 def getPath(agrv):
-	if len(argv) == 3 or len(argv) == 4:
+	l = len(argv)
+	if l >= 3 or l <= 5:
 		for v in argv[1:]:
 			if v[0:1] != '-':
-				return v
+				return Path(v)
 	return None
