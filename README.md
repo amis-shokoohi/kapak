@@ -38,30 +38,32 @@ You can use `kapak.exe` now, but if you want to run it from anywhere in your sys
 
 ### Usage
 ```
-$ kapak [-e -d] <path> -r
-$ kapak -e ./test.txt -r
+$ kapak [options] <path>
+$ kapak -e -r test.txt
+$ kapak -e -z path-to-directory
 ```
 > The positions of **path** argument and **flags** are not important.
 
 For help use `-h` or `--help` flag.<br>
 For encryption mode use `-e` or `--encrypt` flag.<br>
 For decryption mode use `-d` or `--decrypt` flag.<br>
-If you want to remove the target files after the process, use `-r` or `--remove` flag.
+To create a zip archive from a directory before encryption use `-z` or `--zip`.<br>
+To remove the target file(s) after the process, use `-r` or `--remove` flag.
 
 ### Examples
 
 #### Linux
 ```
-$ kapak -e ~/new-dir
-$ kapak -e ~/movie.mp4 -r
-$ kapak -d ~/movie.kpk -r
+$ kapak -e -z ~/new-dir
+$ kapak -e -r ~/movie.mp4
+$ kapak -d ~/movie.kpk
 ```
 
 #### Windows
 ```sh
-C:\> kapak -e "C:\New folder"
-C:\> kapak -e "C:\movie.mp4" -r
-C:\> kapak -d "C:\movie.kpk" -r
+C:\> kapak -e -z "C:\New folder"
+C:\> kapak -e -r "C:\movie.mp4"
+C:\> kapak -d "C:\movie.kpk"
 ```
 > There is a problem with Windows that you might face with it.<br>
 > Do NOT leave \\" or \\' at the end of the path, like ~~"C:\New folder\\"~~ .
