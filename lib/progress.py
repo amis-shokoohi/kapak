@@ -1,28 +1,43 @@
 from math import ceil, floor
 
-progress = [
-	'[□□□□□□□□□□]',
-	'[■□□□□□□□□□]',
-	'[■■□□□□□□□□]',
-	'[■■■□□□□□□□]',
-	'[■■■■□□□□□□]',
-	'[■■■■■□□□□□]',
-	'[■■■■■■□□□□]',
-	'[■■■■■■■□□□]',
-	'[■■■■■■■■□□]',
-	'[■■■■■■■■■□]',
-	'[■■■■■■■■■■]'
-]
+class Progress:
+	__instance = None
 
-def showProgress(percentage):
-	percentage = ceil(percentage)
-	i = floor(percentage / 10)
-	eraser = '\r' + 20*' '
-	print(eraser + '\r ' + progress[i] + ' ' + str(percentage) + '%', end='')
+	def __init__(self):
+		if Progress.__instance == None:
+			Progress.__instance = self
+		else:
+			raise Exception("not able to create another instance from Progress")
+		self.__percentage = 0
+		self.__total_bytes_len = 0
+		self.__bar = [
+			'[□□□□□□□□□□]',
+			'[■□□□□□□□□□]',
+			'[■■□□□□□□□□]',
+			'[■■■□□□□□□□]',
+			'[■■■■□□□□□□]',
+			'[■■■■■□□□□□]',
+			'[■■■■■■□□□□]',
+			'[■■■■■■■□□□]',
+			'[■■■■■■■■□□]',
+			'[■■■■■■■■■□]',
+			'[■■■■■■■■■■]'
+		]
 
-percentage = 0
-def calcPercentage(read_bytes, total_bytes):
-	global percentage
-	p = read_bytes / total_bytes
-	percentage += p * 100 if p <= 1 else 100
-	return percentage
+	@staticmethod
+	def get_instance():
+		if not Progress.__instance:
+			Progress()
+		return Progress.__instance
+
+	def set_total_size(self, total_bytes_len):
+		self.__total_bytes_len = total_bytes_len
+
+	def calc_percentage(self, read_bytes_len):
+		p = read_bytes_len / self.__total_bytes_len
+		self.__percentage += p * 100 if p <= 1 else 100
+
+	def print_percentage(self):
+		percentage = ceil(self.__percentage)
+		i = floor(percentage / 10)
+		print('\r' + 20*' ' + '\r ' + self.__bar[i] + ' ' + str(percentage) + '%', end='')

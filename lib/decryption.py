@@ -1,109 +1,83 @@
-from os import stat
-from re import split
-from math import ceil
-
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
-from lib.passwd import deriveKey
-from lib.progress import showProgress, calcPercentage
-from lib.file_exntension import replaceFileExt
+from lib.passwd import derive_key
+from lib.progress import Progress
+from lib.file_exntension import replace_file_ext
 from lib.constants import BUFFER_SIZE
 
-class Decryptor():
-	def __init__(self, password, f_in):
-		meta = self.readMeta(f_in)
-		(key, _) = deriveKey(password, meta['salt'])
-		self.decryptor = self.aesDecryptor(key, meta['iv'])
-		self.f_out_ext = self.decryptExt(meta['c_ext'])
-		self.f_out = replaceFileExt(f_in, self.f_out_ext)
-		self.f_in = f_in
-		self.f_in_size = stat(f_in).st_size - 48
+class FileDecryptor():
+	def __init__(self, password, f_in_path):
+		self.__progress = Progress.get_instance()
+		self.__fd_in = open(f_in_path, 'rb')
 
-	def decryptFile(self, total_size):
-		with open(self.f_in, 'rb') as f_in:
-			f_in.read(48)
+		meta = self.__read_meta()
+		key, _ = derive_key(password, meta['salt'])
+		self.__decryptor = self.__aes_decryptor(key, meta['iv'])
+
+		self.__f_out_ext = self.__decrypt_ext(meta['c_ext'])
+		self.__f_out_path = replace_file_ext(f_in_path, self.__f_out_ext)
+
+	def get_decrypted_file_name(self):
+		return self.__f_out_path
+
+	def get_decrypted_file_ext(self):
+		return self.__f_out_ext
+
+	def decrypt(self):
+		with self.__fd_in as f_in:
 			r_byte = f_in.read(BUFFER_SIZE)
-
-			with open(self.f_out, 'wb') as f_out:
+			with open(self.__f_out_path, 'wb') as f_out:
 				unpadder = padding.PKCS7(128).unpadder()
-				if self.f_in_size < BUFFER_SIZE:
-					w_byte = self.decryptor.update(r_byte)
+				while r_byte != b'':
+					w_byte = self.__decryptor.update(r_byte)
 					try:
 						w_byte = unpadder.update(w_byte) + unpadder.finalize()
 					except ValueError:
 						pass
 					f_out.write(w_byte)
 
-					percentage = calcPercentage(self.f_in_size, total_size)
-					showProgress(percentage)
-
-					f_out.write(self.decryptor.finalize())
-					return
-
-				for i in range(1, ceil(self.f_in_size / BUFFER_SIZE) + 1):
-					w_byte = self.decryptor.update(r_byte)
-					if i == ceil(self.f_in_size / BUFFER_SIZE):
-						try:
-							w_byte = unpadder.update(w_byte) + unpadder.finalize()
-						except ValueError:
-							pass
-					f_out.write(w_byte)
-
-					percentage = calcPercentage(len(r_byte), total_size)
-					showProgress(percentage)
+					self.__progress.calc_percentage(len(r_byte))
+					self.__progress.print_percentage()
 
 					r_byte = f_in.read(BUFFER_SIZE)
-				f_out.write(self.decryptor.finalize())
+				f_out.write(self.__decryptor.finalize())
 
-	def decryptExt(self, c_ext):
+	def __decrypt_ext(self, c_ext):
 		# 16B: length(2B) + ext(?) + pad(?) + b'kpk'(3B). e.g. 03txtppppppppkpk
-		ext = self.decryptor.update(c_ext)
+		ext = self.__decryptor.update(c_ext)
 
-		if ext[13:16] != b'kpk': # Wrong Password
-			# Backward Compatible code
-			# For encrypted files with version <=v2.0.1
-			def oldDecryptExt(ext):
-				# 16B: pad(?) + b'%kpk%'(5B) + ext(?). e.g. pppppppp%kpk%txt
-				# b'%kpk%' might not be a good seperator
-				s = split(b'%kpk%', ext)
-				if len(s) < 2:
-					raise Exception(' Error: Invalid password\n')
-				return str(s[1], 'utf-8')
-			return oldDecryptExt(ext)
+		if ext[13:16] != b'kpk':
+			raise Exception('invalid password')
 
 		ext_length = None
 		try:
 			ext_length = int(ext[:2])
 		except ValueError:
-			raise Exception(' Error: Invalid password\n')
+			raise Exception('invalid password')
 
 		return str(ext[2:2 + ext_length], 'utf-8')
 
-	def readMeta(self, f_in_path):
+	def __read_meta(self):
 		# Extract iv, salt, encrypted extension
-		f_in = open(f_in_path, 'rb')
-		iv = f_in.read(16)
-		salt = f_in.read(16)
-		c_ext = f_in.read(16)
-		f_in.close()
+		iv = self.__fd_in.read(16)
+		salt = self.__fd_in.read(16)
+		c_ext = self.__fd_in.read(16)
+
+		self.__progress.calc_percentage(48)
+		self.__progress.print_percentage()
+		
 		return {
 			'iv': iv,
 			'salt': salt,
 			'c_ext': c_ext
 		}
 
-	def aesDecryptor(self, key, iv):
+	def __aes_decryptor(self, key, iv):
 		cipher = Cipher(
 			algorithms.AES(key), 
 			modes.CBC(iv), 
 			backend=default_backend()
 		)
 		return cipher.decryptor()
-
-	def getDecryptedFileName(self):
-		return self.f_out
-
-	def getDecryptedFileExt(self):
-		return self.f_out_ext

@@ -4,56 +4,58 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
-from lib.progress import showProgress, calcPercentage
-from lib.file_exntension import fileExt, replaceFileExt
+from lib.progress import Progress
+from lib.file_exntension import file_ext, replace_file_ext
 from lib.constants import BUFFER_SIZE
 
-class Encryptor():
-	def __init__(self, key, salt, f_in):
+class FileEncryptor():
+	def __init__(self, key, salt, f_in_path):
+		self.__f_in_path = f_in_path
+
 		iv = urandom(16) # Generate random iv per file
-		self.encryptor = self.aesEncryptor(key, iv)
-		ext = fileExt(f_in)
+		self.__encryptor = self.__aes_encryptor(key, iv)
 
 		meta = { 'iv': None, 'salt': None, 'c_ext': None }
 		meta['salt'] = salt
 		meta['iv'] = iv
-		meta['c_ext'] = self.encryptExt(ext)
+		ext = file_ext(f_in_path)
+		meta['c_ext'] = self.__encrypt_ext(ext)
 
-		self.f_out = replaceFileExt(f_in, 'kpk')
-		self.f_in = f_in
+		self.__f_out_path = replace_file_ext(f_in_path, 'kpk')
+		if path.exists(self.__f_out_path): # Overwrite error
+			raise Exception(self.__f_out_path + ' already exists')
 
-		# Overwrite error
-		if path.exists(self.f_out):
-			raise Exception(' Error: ' + self.f_out + ' already exists\n')
+		self.__fd_out = open(self.__f_out_path, 'wb')
+		self.__write_meta(meta)
 
-		self.writeMeta(self.f_out, meta)
+		self.__progress = Progress.get_instance()
 
-	def encryptFile(self, total_size):
-		with open(self.f_in, 'rb') as f_in:
+	def encrypt(self):
+		with open(self.__f_in_path, 'rb') as f_in:
 			r_byte = f_in.read(BUFFER_SIZE)
 			if len(r_byte) % 16 != 0:
 				padder = padding.PKCS7(128).padder()
 				r_byte = padder.update(r_byte) + padder.finalize()
 
-			with open(self.f_out, 'ab') as f_out:
+			with self.__fd_out as f_out:
 				while r_byte != b'':
-					w_byte = self.encryptor.update(r_byte)
+					w_byte = self.__encryptor.update(r_byte)
 					f_out.write(w_byte)
 
-					percentage = calcPercentage(len(r_byte), total_size)
-					showProgress(percentage)
+					self.__progress.calc_percentage(len(r_byte))
+					self.__progress.print_percentage()
 
 					r_byte = f_in.read(BUFFER_SIZE)
 					if len(r_byte) % 16 != 0:
 						padder = padding.PKCS7(128).padder()
 						r_byte = padder.update(r_byte) + padder.finalize()
-				f_out.write(self.encryptor.finalize())
+				f_out.write(self.__encryptor.finalize())
 
-	def encryptExt(self, ext):
+	def __encrypt_ext(self, ext):
 		ext = bytes(ext, 'utf-8')
 		ext_length = len(ext)
 		if ext_length > 11:
-			raise Exception(' Error: Unable to encrypt files with extension longer than 11B\n')
+			raise Exception('unable to encrypt files with extension longer than 11B')
 
 		# Strech extension to 16B
 		pad = urandom(11 - ext_length)
@@ -63,17 +65,15 @@ class Encryptor():
 			ext_length = bytes(str(ext_length), 'utf-8')
 		ext = ext_length + ext + pad + b'kpk'
 		
-		return self.encryptor.update(ext)
+		return self.__encryptor.update(ext)
 
-	def writeMeta(self, f_out_path, meta):
+	def __write_meta(self, meta):
 		# Write iv, salt, encrypted extension to first 48B of the output file
-		f_out = open(f_out_path, 'wb')
-		f_out.write(meta['iv'])
-		f_out.write(meta['salt'])
-		f_out.write(meta['c_ext'])
-		f_out.close()
+		self.__fd_out.write(meta['iv'])
+		self.__fd_out.write(meta['salt'])
+		self.__fd_out.write(meta['c_ext'])
 
-	def aesEncryptor(self, key, iv):
+	def __aes_encryptor(self, key, iv):
 		cipher = Cipher(
 			algorithms.AES(key), 
 			modes.CBC(iv), 
