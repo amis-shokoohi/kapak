@@ -7,24 +7,44 @@ DECRYPT_MODE = 2
 _VERSION = 'v2.2.0'
 _BY = 'Amis Shokoohi'
 
-TITLE =  "\n\t▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ "
-TITLE += "\n\t█▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪"
-TITLE += "\n\t▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·"
-TITLE += "\n\t▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌" + "\t" + _VERSION
-TITLE += "\n\t·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀" + "\tby " + _BY
-TITLE += "\n"
+LOGO = '\n\
+    ▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ \n\
+    █▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪\n\
+    ▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·\n\
+    ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    {version}\n\
+    ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀    by {by}\n\
+'.format(version=_VERSION, by=_BY)
 
-DESCRIPTION =    ' Description: \tA simple-to-use file encryption script which'
-DESCRIPTION += '\n \t\tuses AES symmetric encryption methods'
-DESCRIPTION += '\n Link: \t\thttps://github.com/amis-shokoohi/kapak'
+VERSION = '\n kapak {version}\n'.format(version=_VERSION)
 
-USAGE =    ' Usage:\t\tkapak [options] <path>'
-USAGE += '\n Example:\tkapak -e -r test.txt'
-USAGE += '\n Help:\t\tkapak -h'
+DESCRIPTION = '\
+ Description: A simple-to-use file encryption script which\n\
+              uses AES symmetric encryption methods\n\
+ Link:        https://github.com/amis-shokoohi/kapak\n\n\
+ Help:        kapak [ -h | --help ]\n\
+'
 
-HELP_MESSAGE =    ' -h, --help\tShows this help message'
-HELP_MESSAGE += '\n -e, --encrypt\tEncryption mode'
-HELP_MESSAGE += '\n -d, --decrypt\tDecryption mode'
-HELP_MESSAGE += '\n -r, --remove\tRemoves the target file(s)'
-HELP_MESSAGE += '\n -z, --zip\tZips a directory before encryption'
-HELP_MESSAGE += '\n path\t\tPath to a file or a directory'
+USAGE = '\n\
+ Usage: kapak [GLOBAL OPTIONS] COMMAND [COMMAND OPTIONS] PATH\n\n\
+ Global Options:\n\
+   -h, --help     Prints help message\n\
+   -v, --version  Prints version\n\n\
+ Commands:\n\
+   encrypt  Encrypts the specified file/directory\n\
+   decrypt  Decrypts the specified file/directory\n\
+'
+
+USAGE_ENCRYPT = '\n\
+ Usage: kapak encrypt [OPTIONS] PATH\n\n\
+ Options:\n\
+   -h, --help    Prints help message\n\
+   -r, --remove  Removes the target file/directory\n\
+   -z, --zip     Zips the directory before encryption\n\
+'
+
+USAGE_DECRYPT = '\n\
+ Usage: kapak decrypt [OPTIONS] PATH\n\n\
+ Options:\n\
+   -h, --help    Prints help message\n\
+   -r, --remove  Removes the target file/directory\n\
+'

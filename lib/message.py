@@ -1,16 +1,17 @@
-from lib.constants import USAGE, TITLE, HELP_MESSAGE, DESCRIPTION
+from lib.constants import LOGO, DESCRIPTION, VERSION, USAGE, USAGE_ENCRYPT, USAGE_DECRYPT
 
-def printDescription():
-	print(TITLE)
+def print_description():
+	print(LOGO)
 	print(DESCRIPTION)
-	print(' ------------------------------')
-	print(USAGE + '\n')
 
-def printHelp():
-	print(TITLE)
+def print_version():
+	print(VERSION)
+
+def print_help():
 	print(USAGE)
-	print(' ------------------------------')
-	print(HELP_MESSAGE + '\n')
 
-def printUsage():
-	print('\n' + USAGE + '\n')
+def print_help_encrypt():
+	print(USAGE_ENCRYPT)
+
+def print_help_decrypt():
+	print(USAGE_DECRYPT)
