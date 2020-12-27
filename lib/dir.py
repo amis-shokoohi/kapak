@@ -24,7 +24,16 @@ def list_files(dir_path, mode):
 
 
 def zip_dir(dir_path):
+	dir_path_head = os.path.split(dir_path)[0]
+	changed_dir = False
+	curr_dir = os.getcwd()
+	if dir_path_head != '':
+		os.chdir(dir_path_head)
+		changed_dir = True
+
+	dir_path = pathlib.Path(os.path.relpath(dir_path))
 	ff = list(dir_path.glob('**/*'))
+
 	zp = pathlib.Path(
 		os.path.split(dir_path.resolve())[0],
 		dir_path.name+'.'+TEMP_ZIP_EXT
@@ -32,8 +41,13 @@ def zip_dir(dir_path):
 	with zipfile.ZipFile(zp, 'w') as zf:
 		for f in ff:
 			zf.write(f)
+
+	if changed_dir:
+		os.chdir(curr_dir)
+
 	return zp
 
 def unzip_dir(dir_path):
+	dir_path_head = os.path.split(dir_path)[0]
 	with zipfile.ZipFile(dir_path, 'r') as zf:
-		zf.extractall()
+		zf.extractall(path=dir_path_head)
