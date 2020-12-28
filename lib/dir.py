@@ -34,18 +34,18 @@ def zip_dir(dir_path):
 	dir_path = pathlib.Path(os.path.relpath(dir_path))
 	ff = list(dir_path.glob('**/*'))
 
-	zp = pathlib.Path(
-		os.path.split(dir_path.resolve())[0],
-		dir_path.name+'.'+TEMP_ZIP_EXT
-	)
+	zp = dir_path.name+'.'+TEMP_ZIP_EXT
+
 	with zipfile.ZipFile(zp, 'w') as zf:
 		for f in ff:
 			zf.write(f)
 
+	zp_abs = pathlib.Path(zp).resolve()
+
 	if changed_dir:
 		os.chdir(curr_dir)
 
-	return zp
+	return zp_abs
 
 def unzip_dir(dir_path):
 	dir_path_head = os.path.split(dir_path)[0]
