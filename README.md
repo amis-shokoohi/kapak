@@ -1,10 +1,23 @@
-# KapaK script
-### A simple-to-use file encryption script
-![kapak-screenshot](screenshot.png)
+# KapaK: A simple-to-use file encryption script
+```
+$ kapak
 
-### Description
-This script encrypts **a file** or **files whithin a directory recursively** by<br>
-a given password using _AES_ symmetric encryption method.
+    ▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄
+    █▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪
+    ▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·
+    ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    v2.2.0
+    ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀    by Amis Shokoohi
+
+Description: A simple-to-use file encryption script which
+             uses AES symmetric encryption methods
+Link:        https://github.com/amis-shokoohi/kapak
+
+Help:        kapak [ -h | --help ]
+```
+
+## Description
+Kapak can encrypt/decrypt **file/folder** by<br>
+a given password using _AES_ symmetric encryption methods.
 
 > If you are wondering what _kapak_ means, it means _mold_.<br>
 > As moldy food is not eatable, kapaky files are not readable.
@@ -15,13 +28,15 @@ a given password using _AES_ symmetric encryption method.
 - [password](#Password)
 - [contribute](#Contribute)
 
-### Installation
-#### Linux
->Make sure Python 3 is installed.
-
+## Installation
+### Linux
+Make sure Python 3 is installed.
+```
+$ python3 --version
+```
 Install requirements:
 ```
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 Then run the installation script as **root** user. It will copy files into `/bin/kapak` directory and add it to the `PATH`:
 ```
@@ -30,58 +45,77 @@ $ chmod +x ./install.sh
 $ sudo ./install.sh
 ```
 > NOTE: I've only tested this on Debian based distros.
-#### Windows
+### Windows
 Download zipfile from [here](https://github.com/amis-shokoohi/kapak/releases/download/v2.2.0/kapak-windows-v2.2.0.zip).<br>
 You can use `kapak.exe` now, but if you want to run it from anywhere in your system, follow instruction below:
 - Right click on `install.cmd` and click on `Run as administrator`.
 - Open Windows search bar and search for `var`. Click on `Edit the system environment variables`. Click on `Environment Variables...`. In `User variables` section look for `Path`, choose it and hit the `Edit...` button. Click on `New` and paste `C:\PROGRA~1\kapak`. Click `OK` `OK` `OK`, and you're done. Open a terminal an type `kapak`, you should be able to see its logo.
 
-### Usage
+## Usage
 ```
-$ kapak [options] <path>
-$ kapak -e -r test.txt
-$ kapak -e -z path-to-directory
-```
-> The positions of **path** argument and **flags** are not important.
+$ kapak -h
 
-For help use `-h` or `--help` flag.<br>
-For encryption mode use `-e` or `--encrypt` flag.<br>
-For decryption mode use `-d` or `--decrypt` flag.<br>
-To create a zip archive from a directory before encryption use `-z` or `--zip`.<br>
-To remove the target file(s) after the process, use `-r` or `--remove` flag.
+Usage: kapak [GLOBAL OPTIONS] COMMAND [COMMAND OPTIONS] PATH
 
-### Examples
+Global Options:
+  -h, --help     Prints help message
+  -v, --version  Prints version
 
-#### Linux
+Commands:
+  encrypt  Encrypts the specified file/directory
+  decrypt  Decrypts the specified file/directory
 ```
-$ kapak -e -z ~/new-dir
-$ kapak -e -r ~/movie.mp4
-$ kapak -d ~/movie.kpk
+```
+$ kapak encrypt -h
+
+Usage: kapak encrypt [OPTIONS] PATH
+
+Options:
+  -h, --help    Prints help message
+  -r, --remove  Removes the target file/directory
+  -z, --zip     Zips the directory before encryption
+```
+```
+$ kapak decrypt -h
+
+Usage: kapak decrypt [OPTIONS] PATH
+
+Options:
+  -h, --help    Prints help message
+  -r, --remove  Removes the target file/directory
+```
+## Examples
+
+### Linux
+```
+$ kapak encrypt -z ~/new-dir
+$ kapak encrypt -r ~/movie.mp4
+$ kapak decrypt ~/movie.kpk
 ```
 
-#### Windows
-```sh
-C:\> kapak -e -z "C:\New folder"
-C:\> kapak -e -r "C:\movie.mp4"
-C:\> kapak -d "C:\movie.kpk"
+### Windows
 ```
-> There is a problem with Windows that you might face with it.<br>
+C:\> kapak encrypt -z "C:\New folder"
+C:\> kapak encrypt -r "C:\movie.mp4"
+C:\> kapak decrypt "C:\movie.kpk"
+```
+> There is a problem with Windows paths that you might face with it.<br>
 > Do NOT leave \\" or \\' at the end of the path, like ~~"C:\New folder\\"~~ .
 
-### Password
+## Password
 Password length:<br> 
 - min: 3 characters
 - max: 1024 characters
 
 After you run the script, it will prompt you to enter password.<br>
 
-#### There is an alternative way to provide the script with a password.
+### There is an alternative way to provide the script with a password.
 Create a file and name it `password.txt` whithin the `kapak` directory and put your password in it.
-```sh
+```
 $ cd kapak
 $ echo 'My$tr0n9P@ssw0rD' > password.txt
 ```
 After you run the script, it will consume the `password.txt` file and will remove it after the operation is completed.
 
-### Contribute
+## Contribute
 Feel free to contribute however you want.
