@@ -40,4 +40,4 @@ class Progress:
 	def print_percentage(self):
 		percentage = ceil(self.__percentage)
 		i = floor(percentage / 10)
-		print('\r' + 20*' ' + '\r ' + self.__bar[i] + ' ' + str(percentage) + '%', end='')
+		print('\r' + 20*' ' + '\r' + self.__bar[i] + ' ' + str(percentage) + '%', end='')

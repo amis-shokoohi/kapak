@@ -7,26 +7,26 @@ from cryptography.hazmat.backends import default_backend
 from lib.constants import DECRYPT_MODE
 
 def _ask_pass(mode):
-	password1 = getpass(' Enter password: ')
+	password1 = getpass('Enter password: ')
 	password2 = None
 
 	if mode == DECRYPT_MODE:
 		return password1
 		
-	password2 = getpass(' Retype password: ')
+	password2 = getpass('Retype password: ')
 	while password1 != password2:
-		print('\n ERROR: passwords do not match\n')
-		password1 = getpass(' Enter password: ')
-		password2 = getpass(' Retype password: ')
+		print('\nERROR: passwords do not match\n')
+		password1 = getpass('Enter password: ')
+		password2 = getpass('Retype password: ')
 	return password2
 	
 
 def _is_correct_pass_length(password):
 	if len(password) < 3:
-		print('\n ERROR: password should be at least 3 characters\n')
+		print('\nERROR: password should be at least 3 characters\n')
 		return False
 	elif len(password) > 1024:
-		print('\n ERROR: password is to long\n')
+		print('\nERROR: password is to long\n')
 		return False
 	return True
 
