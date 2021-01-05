@@ -21,11 +21,7 @@ class FileEncryptor():
 		ext = file_ext(f_in_path)
 		meta['c_ext'] = self.__encrypt_ext(ext)
 
-		self.__f_out_path = replace_file_ext(f_in_path, 'kpk')
-		if path.exists(self.__f_out_path): # Overwrite error
-			raise Exception(self.__f_out_path + ' already exists')
-
-		self.__fd_out = open(self.__f_out_path, 'wb')
+		self.__fd_out = open(replace_file_ext(f_in_path, 'kpk'), 'wb')
 		self.__write_meta(meta)
 
 		self.__progress = Progress.get_instance()

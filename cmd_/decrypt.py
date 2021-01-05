@@ -25,14 +25,15 @@ def execute(argv):
 	if os.path.isfile(target_path):
 		if file_ext(target_path) != 'kpk':
 			raise Exception('can not decrypt ' + str(target_path))
-		password = get_password(DECRYPT_MODE)		
 		target_size = os.stat(target_path).st_size
 		if target_size == 0:
 			raise Exception(str(target_path) + ' is empty')
+
+		password = get_password(DECRYPT_MODE)		
+
+		print('\nDecrypting...\n')
 		progress = Progress()
 		progress.set_total_size(target_size)
-
-		print('\n Decrypting...\n')
 		decryptor = FileDecryptor(password, target_path)
 		decryptor.decrypt()
 		if decryptor.get_decrypted_file_ext() == TEMP_ZIP_EXT:
@@ -40,14 +41,13 @@ def execute(argv):
 			os.remove(decryptor.get_decrypted_file_name())
 		if should_remove:
 			os.remove(target_path)
-		print('\r' + 20*' ' + '\r [■■■■■■■■■■] 100%') # TODO: This is a hack, should be fixed in lib/progress.py
-
+		print('\r' + 20*' ' + '\r[■■■■■■■■■■] 100%\n') # TODO: This is a hack, should be fixed in lib/progress.py
 		return
 
 	if os.path.isdir(target_path):
 		password = get_password(DECRYPT_MODE)		
 
-		print('\n Decrypting...\n')
+		print('\nDecrypting...\n')
 		ff = list_files(target_path, DECRYPT_MODE) # List of files in the directory
 		if len(ff) == 0:
 			raise Exception(str(target_path) + ' is empty')
@@ -61,4 +61,4 @@ def execute(argv):
 			decryptor.decrypt()
 			if should_remove:
 				os.remove(f)
-		print('\r' + 20*' ' + '\r [■■■■■■■■■■] 100%') # TODO: This is a hack, should be fixed in lib/progress.py
+		print('\r' + 20*' ' + '\r[■■■■■■■■■■] 100%\n') # TODO: This is a hack, should be fixed in lib/progress.py
