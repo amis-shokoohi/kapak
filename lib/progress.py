@@ -2,27 +2,26 @@ from math import ceil, floor
 
 class Progress:
 	__instance = None
+	__bar = [
+		'[□□□□□□□□□□]',
+		'[■□□□□□□□□□]',
+		'[■■□□□□□□□□]',
+		'[■■■□□□□□□□]',
+		'[■■■■□□□□□□]',
+		'[■■■■■□□□□□]',
+		'[■■■■■■□□□□]',
+		'[■■■■■■■□□□]',
+		'[■■■■■■■■□□]',
+		'[■■■■■■■■■□]',
+		'[■■■■■■■■■■]'
+	]
 
 	def __init__(self):
-		if Progress.__instance == None:
-			Progress.__instance = self
-		else:
+		if Progress.__instance:
 			raise Exception("not able to create another instance from Progress")
+		Progress.__instance = self
 		self.__percentage = 0
 		self.__total_bytes_len = 0
-		self.__bar = [
-			'[□□□□□□□□□□]',
-			'[■□□□□□□□□□]',
-			'[■■□□□□□□□□]',
-			'[■■■□□□□□□□]',
-			'[■■■■□□□□□□]',
-			'[■■■■■□□□□□]',
-			'[■■■■■■□□□□]',
-			'[■■■■■■■□□□]',
-			'[■■■■■■■■□□]',
-			'[■■■■■■■■■□]',
-			'[■■■■■■■■■■]'
-		]
 
 	@staticmethod
 	def get_instance():

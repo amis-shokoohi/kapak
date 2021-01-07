@@ -14,14 +14,10 @@ def calc_total_size(files):
 def list_files(dir_path, mode):
 	if mode == DECRYPT_MODE:
 		return list(dir_path.glob('**/*.kpk'))
-
-	file_list = []
-	all_files = list(dir_path.glob('**/*'))
-	for f in all_files:
-		if os.path.isfile(f) and file_ext(f) != 'kpk':
-			file_list.append(f)
-	return file_list
-
+	return list(filter(
+		lambda f: os.path.isfile(f) and file_ext(f) != 'kpk',
+		list(dir_path.glob('**/*'))
+	))
 
 def zip_dir(dir_path):
 	dir_path_head = os.path.split(dir_path)[0]
