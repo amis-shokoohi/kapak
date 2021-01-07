@@ -49,7 +49,7 @@ class FileEncryptor():
 		# Strech extension to 16B
 		pad = urandom(11 - ext_length)
 		ext_length_in_bytes = bytes(str(ext_length), 'utf-8')
-		if ext_length < 9:
+		if ext_length < 10:
 			ext_length_in_bytes = b'0' + ext_length_in_bytes
 		ext = ext_length_in_bytes + ext + pad + b'kpk'
 		return self.__encryptor.update(ext)
