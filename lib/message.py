@@ -14,7 +14,7 @@ def print_help_encrypt():
 def print_help_decrypt():
 	print(USAGE_DECRYPT)
 
-_VERSION = 'v3.0.0'
+_VERSION = 'v3.0.1'
 _BY = 'Amis Shokoohi'
 
 LOGO = '\n\

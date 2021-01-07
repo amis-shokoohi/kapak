@@ -5,7 +5,7 @@ $ kapak
     ▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄
     █▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪
     ▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·
-    ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    v3.0.0
+    ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    v3.0.1
     ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀    by Amis Shokoohi
 
 Description: A simple-to-use file encryption script which
@@ -46,7 +46,7 @@ $ sudo ./install.sh
 ```
 > NOTE: I've only tested this on Debian based distros.
 ### Windows
-Download zipfile from [here](https://github.com/amis-shokoohi/kapak/releases/download/v3.0.0/kapak-windows-v3.0.0.zip).<br>
+Download zipfile from [here](https://github.com/amis-shokoohi/kapak/releases/download/v3.0.1/kapak-windows-v3.0.1.zip).<br>
 You can use `kapak.exe` now, but if you want to run it from anywhere in your system, follow instruction below:
 - Right click on `install.cmd` and click on `Run as administrator`.
 - Open Windows search bar and search for `var`. Click on `Edit the system environment variables`. Click on `Environment Variables...`. In `User variables` section look for `Path`, choose it and hit the `Edit...` button. Click on `New` and paste `C:\PROGRA~1\kapak`. Click `OK` `OK` `OK`, and you're done. Open a terminal an type `kapak`, you should be able to see its logo.
