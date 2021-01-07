@@ -7,7 +7,7 @@ from lib.file_exntension import file_ext
 from lib.passwd import get_password, derive_key
 from lib.constants import ENCRYPT_MODE
 from lib.progress import Progress
-from lib.encryption import FileEncryptor
+from lib.encryptor import FileEncryptor
 from lib.file_exntension import replace_file_ext
 from lib.dir import zip_dir, calc_total_size, list_files
 

@@ -6,7 +6,7 @@ from lib.file_exntension import file_ext
 from lib.passwd import get_password
 from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT
 from lib.progress import Progress
-from lib.decryption import FileDecryptor
+from lib.decryptor import FileDecryptor
 from lib.dir import unzip_dir, calc_total_size, list_files
 
 def execute(argv):
@@ -36,9 +36,9 @@ def execute(argv):
 		progress.set_total_size(target_size)
 		decryptor = FileDecryptor(password, target_path)
 		decryptor.decrypt()
-		if decryptor.get_decrypted_file_ext() == TEMP_ZIP_EXT:
-			unzip_dir(decryptor.get_decrypted_file_name())
-			os.remove(decryptor.get_decrypted_file_name())
+		if decryptor.get_file_ext() == TEMP_ZIP_EXT:
+			unzip_dir(decryptor.get_file_name())
+			os.remove(decryptor.get_file_name())
 		if should_remove:
 			os.remove(target_path)
 		print('\r' + 20*' ' + '\r[■■■■■■■■■■] 100%\n') # TODO: This is a hack, should be fixed in lib/progress.py
