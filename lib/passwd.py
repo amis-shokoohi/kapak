@@ -6,9 +6,8 @@ from cryptography.hazmat.backends import default_backend
 
 from lib.constants import DECRYPT_MODE
 
-def _ask_pass(mode):
+def _ask_pass(mode: int) -> str:
 	password1 = getpass('Enter password: ')
-	password2 = None
 
 	if mode == DECRYPT_MODE:
 		return password1
@@ -21,7 +20,7 @@ def _ask_pass(mode):
 	return password2
 	
 
-def _is_correct_pass_length(password):
+def _is_correct_pass_length(password: str) -> bool:
 	if len(password) < 3:
 		print('\nERROR: password should be at least 3 characters\n')
 		return False
@@ -30,14 +29,13 @@ def _is_correct_pass_length(password):
 		return False
 	return True
 
-def get_password(mode):
+def get_password(mode: int) -> str:
 	password = None
 	# Read the password from password.txt file
 	f = 'password.txt'
 	if path.exists(f):
-		passwd_file = open(f, 'r')
-		password = passwd_file.read()
-		passwd_file.close()
+		with open(f, 'r') as passwd_file:
+			password = str(passwd_file.read())
 		remove(f)
 	else: # Prompt user to enter the password
 		password = _ask_pass(mode)
@@ -49,7 +47,7 @@ def get_password(mode):
 
 # Needs at least 256MB of RAM
 # Takes about a second to derive a key
-def derive_key(password, salt):
+def derive_key(password: str, salt: bytes) -> (bytes, bytes):
 	password = bytes(password, 'utf-8')
 	if not salt:
 		salt = urandom(16)

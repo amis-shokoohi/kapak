@@ -1,4 +1,6 @@
 from os import urandom, path
+from pathlib import Path
+from typing import BinaryIO
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -9,7 +11,7 @@ from lib.file_exntension import file_ext, replace_file_ext
 from lib.pipeline import pipeline
 
 class FileEncryptor():
-	def __init__(self, key, salt, f_in_path):
+	def __init__(self, key: bytes, salt: bytes, f_in_path: Path):
 		self.__f_in_path = f_in_path
 		self.__f_out_path = replace_file_ext(f_in_path, 'kpk')
 		self.__progress = Progress.get_instance()
@@ -24,14 +26,14 @@ class FileEncryptor():
 
 	def encrypt(self):
 		ext = file_ext(self.__f_in_path)
-		self.__header['cipher_ext'] = self.__encrypt_ext(ext)
+		self.__header['cipher_ext'] = self.__encrypt_ext(bytes(ext, 'utf-8'))
 		with open(self.__f_in_path, 'rb') as fd_in:
 			with open(self.__f_out_path, 'wb') as fd_out:
 				self.__write_header(fd_out)
 				pipeline(fd_in, fd_out, self.__update)
 				fd_out.write(self.__encryptor.finalize())
 
-	def __update(self, in_bytes):
+	def __update(self, in_bytes: bytes) -> bytes:
 		if len(in_bytes) % 16 != 0:
 			padder = padding.PKCS7(128).padder()
 			in_bytes = padder.update(in_bytes) + padder.finalize()
@@ -40,8 +42,7 @@ class FileEncryptor():
 		self.__progress.print_percentage()
 		return out_bytes
 
-	def __encrypt_ext(self, ext):
-		ext = bytes(ext, 'utf-8')
+	def __encrypt_ext(self, ext: bytes) -> bytes:
 		ext_length = len(ext)
 		if ext_length > 11:
 			raise Exception('unable to encrypt files with extension longer than 11B')
@@ -51,16 +52,16 @@ class FileEncryptor():
 		ext_length_in_bytes = bytes(str(ext_length), 'utf-8')
 		if ext_length < 10:
 			ext_length_in_bytes = b'0' + ext_length_in_bytes
-		ext = ext_length_in_bytes + ext + pad + b'kpk'
-		return self.__encryptor.update(ext)
+		padded_ext = ext_length_in_bytes + ext + pad + b'kpk'
+		return self.__encryptor.update(padded_ext)
 
-	def __write_header(self, fd_out):
+	def __write_header(self, fd_out: BinaryIO):
 		# Writes iv, salt & encrypted extension to first 48B of the output file
 		fd_out.write(self.__header['iv'])
 		fd_out.write(self.__header['salt'])
 		fd_out.write(self.__header['cipher_ext'])
 
-	def __aes_encryptor(self, key, iv):
+	def __aes_encryptor(self, key: bytes, iv: bytes):
 		cipher = Cipher(
 			algorithms.AES(key), 
 			modes.CBC(iv), 

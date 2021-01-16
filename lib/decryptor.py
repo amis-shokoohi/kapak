@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
@@ -8,7 +10,7 @@ from lib.file_exntension import replace_file_ext
 from lib.pipeline import pipeline
 
 class FileDecryptor():
-	def __init__(self, password, f_in_path):
+	def __init__(self, password: str, f_in_path: Path):
 		self.__f_in_path = f_in_path
 		self.__progress = Progress.get_instance()
 
@@ -19,21 +21,20 @@ class FileDecryptor():
 		self.__f_out_ext = self.__decrypt_ext(header['cipher_ext'])
 		self.__f_out_path = replace_file_ext(f_in_path, self.__f_out_ext)
 
-	def get_file_name(self):
+	def get_file_name(self) -> Path:
 		return self.__f_out_path
 
-	def get_file_ext(self):
+	def get_file_ext(self) -> str:
 		return self.__f_out_ext
 
 	def decrypt(self):
 		with open(self.__f_in_path, 'rb') as fd_in:
-			# Skip the 48B header
-			fd_in.seek(48)
+			fd_in.seek(48) # Skip the header
 			with open(self.__f_out_path, 'wb') as fd_out:
 				pipeline(fd_in, fd_out, self.__update)
 				fd_out.write(self.__decryptor.finalize())
 
-	def __update(self, in_bytes):
+	def __update(self, in_bytes: bytes) -> bytes:
 		out_bytes = self.__decryptor.update(in_bytes)
 		try:
 			unpadder = padding.PKCS7(128).unpadder()
@@ -44,7 +45,7 @@ class FileDecryptor():
 		self.__progress.print_percentage()
 		return out_bytes
 
-	def __decrypt_ext(self, cipher_ext):
+	def __decrypt_ext(self, cipher_ext: bytes) -> str:
 		# 16B: length(2B) + ext(?) + pad(?) + b'kpk'(3B). e.g. 03txtppppppppkpk
 		ext = self.__decryptor.update(cipher_ext)
 
@@ -59,7 +60,7 @@ class FileDecryptor():
 
 		return str(ext[2:2 + ext_length], 'utf-8')
 
-	def __read_header(self):
+	def __read_header(self) -> dict:
 		header = {
 			'iv': None,
 			'salt': None,
@@ -73,7 +74,7 @@ class FileDecryptor():
 		self.__progress.print_percentage()	
 		return header
 
-	def __aes_decryptor(self, key, iv):
+	def __aes_decryptor(self, key: bytes, iv: bytes):
 		cipher = Cipher(
 			algorithms.AES(key), 
 			modes.CBC(iv), 

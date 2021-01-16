@@ -1,15 +1,13 @@
 import re
+from pathlib import Path
 
-def file_ext(f_path):
-	p = re.compile('\.([\w]+)$')
-	match = p.search(str(f_path))
-	if match == None:
-		return ''
-	return match.group(1)
+def file_ext(f_path: Path) -> str:
+	return f_path.suffix[1:]
 
-def replace_file_ext(f_path, new_ext):
+def replace_file_ext(f_path: Path, new_ext: str) -> Path:
 	p = re.compile('\.[\w]+$')
-	match = p.search(str(f_path))
+	f_path_str = str(f_path)
+	match = p.search(f_path_str)
 	if match == None:
-		return str(f_path) + '.' + new_ext
-	return p.sub('.' + new_ext, str(f_path))
+		return Path(f_path_str + '.' + new_ext)
+	return Path(p.sub('.' + new_ext, f_path_str))

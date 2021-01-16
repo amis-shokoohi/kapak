@@ -29,10 +29,10 @@ class Progress:
 			Progress()
 		return Progress.__instance
 
-	def set_total_size(self, total_bytes_len):
+	def set_total_size(self, total_bytes_len: int):
 		self.__total_bytes_len = total_bytes_len
 
-	def calc_percentage(self, read_bytes_len):
+	def calc_percentage(self, read_bytes_len: int):
 		p = read_bytes_len / self.__total_bytes_len
 		self.__percentage += p * 100 if p <= 1 else 100
 
