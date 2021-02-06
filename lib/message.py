@@ -15,15 +15,14 @@ def print_help_decrypt():
 	print(USAGE_DECRYPT)
 
 _VERSION = 'v3.0.1'
-_BY = 'Amis Shokoohi'
 
 LOGO = '\n\
     ▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ \n\
     █▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪\n\
     ▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·\n\
     ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    {version}\n\
-    ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀    by {by}\n\
-'.format(version=_VERSION, by=_BY)
+    ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀\n\
+'.format(version=_VERSION)
 
 VERSION = '\nkapak {version}\n'.format(version=_VERSION)
 
