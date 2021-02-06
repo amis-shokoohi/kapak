@@ -1,4 +1,4 @@
-from sys import argv, exit
+from sys import argv, exit, stderr
 
 from lib.message import print_description, print_help, print_version
 import cmd_.encrypt
@@ -24,5 +24,5 @@ if __name__ == '__main__':
 	except KeyboardInterrupt:
 		exit()
 	except Exception as err:
-		print('\r' + 40*' ' + '\r\nERROR: ' + str(err) + '\n')
+		stderr.write('\r' + 40*' ' + '\r\nERROR: ' + str(err) + '\n')
 		exit(1)

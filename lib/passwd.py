@@ -1,5 +1,6 @@
 from os import path, remove, urandom
 from getpass import getpass
+from sys import stderr
 
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.backends import default_backend
@@ -14,7 +15,7 @@ def _ask_pass(mode: int) -> str:
 		
 	password2 = getpass('Retype password: ')
 	while password1 != password2:
-		print('\nERROR: passwords do not match\n')
+		stderr.write('\nERROR: passwords do not match\n')
 		password1 = getpass('Enter password: ')
 		password2 = getpass('Retype password: ')
 	return password2
@@ -22,10 +23,10 @@ def _ask_pass(mode: int) -> str:
 
 def _is_correct_pass_length(password: str) -> bool:
 	if len(password) < 3:
-		print('\nERROR: password should be at least 3 characters\n')
+		stderr.write('\nERROR: password should be at least 3 characters\n')
 		return False
 	elif len(password) > 1024:
-		print('\nERROR: password is to long\n')
+		stderr.write('\nERROR: password is to long\n')
 		return False
 	return True
 
