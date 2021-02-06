@@ -1,10 +1,15 @@
 from lib.constants import BUFFER_SIZE
 from typing import Callable, BinaryIO
+from functools import partial
 
-def pipeline(fd_in: BinaryIO, fd_out: BinaryIO, fn: Callable[[bytes], bytes]):
-	while True:
-		r_bytes = fd_in.read(BUFFER_SIZE)
-		if r_bytes == b'':
-			break
-		w_bytes = fn(r_bytes)
-		fd_out.write(w_bytes)
+def pipeline(
+	fd_in: BinaryIO, 
+	op1: Callable[[bytes], bytes],
+	op2: Callable[[bytes], bytes],
+	op3: Callable[[bytes], bytes],
+	fd_out: BinaryIO):
+	for chunk in iter(partial(fd_in.read, BUFFER_SIZE), b''):
+		chunk = op1(chunk)
+		chunk = op2(chunk)
+		chunk = op3(chunk)
+		fd_out.write(chunk)
