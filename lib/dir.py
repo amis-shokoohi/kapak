@@ -20,17 +20,19 @@ def list_files(dir_path: Path, mode: int) -> [Path]:
 	))
 
 def zip_dir(dir_path: Path) -> Path:
-	dir_path_head = os.path.split(dir_path)[0]
+	splitted = os.path.split(dir_path)
+	dir_path_head = splitted[0]
+	dir_path_rel = Path(splitted[1])
+
 	changed_dir = False
 	curr_dir = os.getcwd()
 	if dir_path_head != '':
 		os.chdir(dir_path_head)
 		changed_dir = True
 
-	dir_path = Path(os.path.relpath(dir_path))
-	ff = list(dir_path.glob('**/*'))
+	ff = list(dir_path_rel.rglob('*'))
 
-	zp = dir_path.name+'.'+TEMP_ZIP_EXT
+	zp = dir_path_rel.name+'.'+TEMP_ZIP_EXT
 
 	with zipfile.ZipFile(zp, 'w') as zf:
 		for f in ff:

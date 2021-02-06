@@ -15,18 +15,17 @@ def _ask_pass(mode: int) -> str:
 		
 	password2 = getpass('Retype password: ')
 	while password1 != password2:
-		stderr.write('\nERROR: passwords do not match\n')
+		stderr.write('\nERROR: passwords do not match\n\n')
 		password1 = getpass('Enter password: ')
 		password2 = getpass('Retype password: ')
 	return password2
-	
 
 def _is_correct_pass_length(password: str) -> bool:
 	if len(password) < 3:
-		stderr.write('\nERROR: password should be at least 3 characters\n')
+		stderr.write('\nERROR: password should be at least 3 characters\n\n')
 		return False
 	elif len(password) > 1024:
-		stderr.write('\nERROR: password is to long\n')
+		stderr.write('\nERROR: password is to long\n\n')
 		return False
 	return True
 
