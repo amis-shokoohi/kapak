@@ -1,6 +1,7 @@
 from os import urandom, path
 from pathlib import Path
-from typing import BinaryIO
+from functools import partial
+from typing import BinaryIO, Dict
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -10,61 +11,54 @@ from lib.progress import Progress
 from lib.file_exntension import file_ext, replace_file_ext
 from lib.pipeline import pipeline
 
-class FileEncryptor():
-	def __init__(self, key: bytes, salt: bytes, f_in_path: Path):
-		self.__f_in_path = f_in_path
-		self.__f_out_path = replace_file_ext(f_in_path, 'kpk')
-		self.__progress = Progress.get_instance()
+def encrypt(key: bytes, salt: bytes, f_in_path: Path):
+	ext = file_ext(f_in_path)
+	if len(ext) > 11:
+		raise Exception('unable to encrypt files with extension longer than 11B')
+	
+	iv = urandom(16)
+	encryptor = Cipher(
+		algorithms.AES(key), 
+		modes.CBC(iv), 
+		backend=default_backend()
+	).encryptor()
 
-		iv = urandom(16) # Generate random iv per file
-		self.__encryptor = self.__aes_encryptor(key, iv)
-		self.__header = {
-			'iv': iv,
-			'salt': salt,
-			'cipher_ext': None
-		}
+	header = {
+		'iv': iv,
+		'salt': salt,
+		'cipher_ext': encryptor.update(_pad_ext(bytes(ext, 'utf-8')))
+	}
+	f_out_path = replace_file_ext(f_in_path, 'kpk')
+	progress = Progress.get_instance()
+	
+	with open(f_in_path, 'rb') as fd_in:
+		with open(f_out_path, 'wb') as fd_out:
+			_write_header(fd_out, header)
+			pipeline(
+				fd_in,
+				progress.update,
+				_pad_bytes,
+				encryptor.update,
+				fd_out
+			)
+			fd_out.write(encryptor.finalize())
 
-	def encrypt(self):
-		ext = file_ext(self.__f_in_path)
-		self.__header['cipher_ext'] = self.__encrypt_ext(bytes(ext, 'utf-8'))
-		with open(self.__f_in_path, 'rb') as fd_in:
-			with open(self.__f_out_path, 'wb') as fd_out:
-				self.__write_header(fd_out)
-				pipeline(fd_in, fd_out, self.__update)
-				fd_out.write(self.__encryptor.finalize())
+def _pad_bytes(bytes_in: bytes) -> bytes:
+	padder = padding.PKCS7(128).padder()
+	return padder.update(bytes_in) + padder.finalize()
 
-	def __update(self, in_bytes: bytes) -> bytes:
-		if len(in_bytes) % 16 != 0:
-			padder = padding.PKCS7(128).padder()
-			in_bytes = padder.update(in_bytes) + padder.finalize()
-		out_bytes = self.__encryptor.update(in_bytes)
-		self.__progress.calc_percentage(len(in_bytes))
-		self.__progress.print_percentage()
-		return out_bytes
+def _pad_ext(ext: bytes) -> bytes:
+	# Streches extension to 16B
+	ext_length = len(ext)
+	pad = urandom(11 - ext_length)
+	ext_length_in_bytes = bytes(str(ext_length), 'utf-8')
+	if ext_length < 10:
+		ext_length_in_bytes = b'0' + ext_length_in_bytes
+	padded_ext = ext_length_in_bytes + ext + pad + b'kpk'
+	return padded_ext
 
-	def __encrypt_ext(self, ext: bytes) -> bytes:
-		ext_length = len(ext)
-		if ext_length > 11:
-			raise Exception('unable to encrypt files with extension longer than 11B')
-
-		# Strech extension to 16B
-		pad = urandom(11 - ext_length)
-		ext_length_in_bytes = bytes(str(ext_length), 'utf-8')
-		if ext_length < 10:
-			ext_length_in_bytes = b'0' + ext_length_in_bytes
-		padded_ext = ext_length_in_bytes + ext + pad + b'kpk'
-		return self.__encryptor.update(padded_ext)
-
-	def __write_header(self, fd_out: BinaryIO):
-		# Writes iv, salt & encrypted extension to first 48B of the output file
-		fd_out.write(self.__header['iv'])
-		fd_out.write(self.__header['salt'])
-		fd_out.write(self.__header['cipher_ext'])
-
-	def __aes_encryptor(self, key: bytes, iv: bytes):
-		cipher = Cipher(
-			algorithms.AES(key), 
-			modes.CBC(iv), 
-			backend=default_backend()
-		)
-		return cipher.encryptor()
+def _write_header(fd_out: BinaryIO, header: Dict[str, bytes]):
+	# Writes iv, salt & encrypted extension to first 48B of the output file
+	fd_out.write(header['iv'])
+	fd_out.write(header['salt'])
+	fd_out.write(header['cipher_ext'])
