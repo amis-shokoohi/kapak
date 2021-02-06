@@ -20,7 +20,7 @@ class Progress:
 		if Progress.__instance:
 			raise Exception("not able to create another instance from Progress")
 		Progress.__instance = self
-		self.__percentage = 0
+		self.__processed_bytes_len = 0
 		self.__total_bytes_len = 0
 
 	@staticmethod
@@ -32,11 +32,15 @@ class Progress:
 	def set_total_size(self, total_bytes_len: int):
 		self.__total_bytes_len = total_bytes_len
 
-	def calc_percentage(self, read_bytes_len: int):
-		p = read_bytes_len / self.__total_bytes_len
-		self.__percentage += p * 100 if p <= 1 else 100
+	def update(self, bytes_in: bytes) -> bytes:
+		self.__processed_bytes_len += len(bytes_in)
+		self.__print()
+		return bytes_in
 
-	def print_percentage(self):
-		percentage = ceil(self.__percentage)
+	def __print(self):
+		p = ceil(self.__processed_bytes_len / self.__total_bytes_len * 100)
+		percentage = p if p <= 100 else 100
 		i = floor(percentage / 10)
 		print('\r' + 20*' ' + '\r' + self.__bar[i] + ' ' + str(percentage) + '%', end='')
+		if percentage == 100:
+			print()
