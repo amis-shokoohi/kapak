@@ -44,6 +44,8 @@ def encrypt(key: bytes, salt: bytes, f_in_path: Path):
 			fd_out.write(encryptor.finalize())
 
 def _pad_bytes(bytes_in: bytes) -> bytes:
+	if len(bytes_in) % 16 == 0:
+		return bytes_in
 	padder = padding.PKCS7(128).padder()
 	return padder.update(bytes_in) + padder.finalize()
 
