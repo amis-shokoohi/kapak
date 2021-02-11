@@ -42,5 +42,3 @@ class Progress:
 		percentage = p if p <= 100 else 100
 		i = floor(percentage / 10)
 		print('\r' + 20*' ' + '\r' + self.__bar[i] + ' ' + str(percentage) + '%', end='')
-		if percentage == 100:
-			print()
