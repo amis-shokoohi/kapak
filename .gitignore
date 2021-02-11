@@ -1,5 +1,4 @@
 .vscode/
-test*
 **/__pycache__/
 todo.*
 password.txt
