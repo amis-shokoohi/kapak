@@ -46,14 +46,16 @@ Commands:\n\
 USAGE_ENCRYPT = '\n\
 Usage: kapak encrypt [OPTIONS] PATH\n\n\
 Options:\n\
-  -h, --help    Prints help message\n\
-  -r, --remove  Removes the target file/directory\n\
-  -z, --zip     Zips the directory before encryption\n\
+  -h, --help         Prints help message\n\
+  -r, --remove       Removes the target file/directory\n\
+  -z, --zip          Zips the directory before encryption\n\
+  -b, --buffer-size  Buffer size in megabytes (default: 64)\n\
 '
 
 USAGE_DECRYPT = '\n\
 Usage: kapak decrypt [OPTIONS] PATH\n\n\
 Options:\n\
-  -h, --help    Prints help message\n\
-  -r, --remove  Removes the target file/directory\n\
+  -h, --help         Prints help message\n\
+  -r, --remove       Removes the target file/directory\n\
+  -b, --buffer-size  Buffer size in megabytes (default: 64)\n\
 '

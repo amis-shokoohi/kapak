@@ -8,9 +8,9 @@ from cryptography.hazmat.primitives import padding
 from lib.passwd import derive_key
 from lib.progress import Progress
 from lib.file_exntension import replace_file_ext
-from lib.pipeline import pipeline
+from lib.pipeline import new_pipeline
 
-def decrypt(password: str, f_in_path: Path) -> (Path, str):
+def decrypt(password: str, f_in_path: Path, buffer_size: int) -> (Path, str):
 	header = _read_header(f_in_path)
 	key, _ = derive_key(password, header['salt'])
 	decryptor = Cipher(
@@ -23,6 +23,8 @@ def decrypt(password: str, f_in_path: Path) -> (Path, str):
 	f_out_path = replace_file_ext(f_in_path, f_out_ext)
 	
 	progress = Progress.get_instance()
+	pipeline = new_pipeline(buffer_size)
+	
 	with open(f_in_path, 'rb') as fd_in:
 		fd_in.seek(48) # Skip the header
 		with open(f_out_path, 'wb') as fd_out:

@@ -5,7 +5,7 @@ import argparse
 from lib.message import print_help_decrypt
 from lib.file_exntension import file_ext
 from lib.passwd import get_password
-from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT
+from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, BUFFER_SIZE
 from lib.progress import Progress
 import lib.decryptor
 from lib.dir import unzip_dir, calc_total_size, list_files
@@ -19,18 +19,21 @@ def execute(argv: [str]):
 	subparser = parser.add_subparsers()
 	subparser_decrypt_cmd = subparser.add_parser('decrypt', add_help=False)
 	subparser_decrypt_cmd.add_argument('-r', '--remove', action='store_true', dest='should_remove')
+	subparser_decrypt_cmd.add_argument('-b', '--buffer-size', nargs='?', type=int, default=BUFFER_SIZE, dest='buffer_size')
 	subparser_decrypt_cmd.add_argument('path', type=Path)
 	args = subparser_decrypt_cmd.parse_args(args=argv[2:])
 
+	args.buffer_size = args.buffer_size * 1024 * 1024 # ?MB
 	if not os.path.exists(args.path):
 		raise Exception('can not find ' + str(args.path))
 
 	if os.path.isfile(args.path):
-		decrypt_file(args.path, args.should_remove)
+		decrypt_file(args.path, args.should_remove, args.buffer_size)
 	elif os.path.isdir(args.path):
-		decrypt_dir(args.path, args.should_remove)
+		decrypt_dir(args.path, args.should_remove, args.buffer_size)
+	print() # Prints new line
 
-def decrypt_file(target_path: Path, should_remove: bool):
+def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	if file_ext(target_path) != 'kpk':
 			raise Exception('can not decrypt ' + str(target_path))
 
@@ -43,7 +46,7 @@ def decrypt_file(target_path: Path, should_remove: bool):
 	print('\nDecrypting...\n')
 	progress = Progress()
 	progress.set_total_size(target_size)
-	f_out_path, f_out_ext = lib.decryptor.decrypt(password, target_path)
+	f_out_path, f_out_ext = lib.decryptor.decrypt(password, target_path, buffer_size)
 	if f_out_ext == TEMP_ZIP_EXT:
 		unzip_dir(f_out_path)
 		os.remove(f_out_path)
@@ -51,7 +54,7 @@ def decrypt_file(target_path: Path, should_remove: bool):
 	if should_remove:
 		os.remove(target_path)
 
-def decrypt_dir(target_path: Path, should_remove: bool):
+def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	password = get_password(DECRYPT_MODE)
 
 	print('\nDecrypting...\n')
@@ -64,6 +67,6 @@ def decrypt_dir(target_path: Path, should_remove: bool):
 	progress = Progress()
 	progress.set_total_size(target_size)
 	for f in ff:
-		_, _ = lib.decryptor.decrypt(password, f)
+		_, _ = lib.decryptor.decrypt(password, f, buffer_size)
 		if should_remove:
 			os.remove(f)
