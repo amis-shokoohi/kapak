@@ -22,7 +22,6 @@ def decrypt(password: str, f_in_path: Path, buffer_size: int) -> (Path, str):
 	f_out_ext = _unpad_ext(decryptor.update(header['cipher_ext']))
 	f_out_path = replace_file_ext(f_in_path, f_out_ext)
 	
-	progress = Progress.get_instance()
 	pipeline = new_pipeline(buffer_size)
 	
 	with open(f_in_path, 'rb') as fd_in:
@@ -30,7 +29,6 @@ def decrypt(password: str, f_in_path: Path, buffer_size: int) -> (Path, str):
 		with open(f_out_path, 'wb') as fd_out:
 			pipeline(
 				fd_in,
-				progress.update,
 				decryptor.update,
 				_unpad_bytes,
 				fd_out
@@ -61,10 +59,11 @@ def _unpad_ext(ext: bytes) -> str:
 
 def _read_header(f_in_path: Path) -> Dict[str, bytes]:
 	header = b''
+	header_len = 48
 	with open(f_in_path, 'rb') as fd_in:
-		header = fd_in.read(48)
+		header = fd_in.read(header_len)
 	progress = Progress.get_instance()
-	progress.update(header)
+	progress.update(header_len)
 	return {
 		'iv': header[0:16],
 		'salt': header[16:32],

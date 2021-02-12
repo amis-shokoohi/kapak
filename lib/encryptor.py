@@ -7,7 +7,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
-from lib.progress import Progress
 from lib.file_exntension import file_ext, replace_file_ext
 from lib.pipeline import new_pipeline
 
@@ -29,7 +28,6 @@ def encrypt(key: bytes, salt: bytes, f_in_path: Path, buffer_size: int):
 		'cipher_ext': encryptor.update(_pad_ext(bytes(ext, 'utf-8')))
 	}
 	f_out_path = replace_file_ext(f_in_path, 'kpk')
-	progress = Progress.get_instance()
 	pipeline = new_pipeline(buffer_size)
 	
 	with open(f_in_path, 'rb') as fd_in:
@@ -37,7 +35,6 @@ def encrypt(key: bytes, salt: bytes, f_in_path: Path, buffer_size: int):
 			_write_header(fd_out, header)
 			pipeline(
 				fd_in,
-				progress.update,
 				_pad_bytes,
 				encryptor.update,
 				fd_out

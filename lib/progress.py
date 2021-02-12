@@ -32,12 +32,10 @@ class Progress:
 	def set_total_size(self, total_bytes_len: int):
 		self.__total_bytes_len = total_bytes_len
 
-	def update(self, bytes_in: bytes) -> bytes:
-		self.__processed_bytes_len += len(bytes_in)
-		self.__print()
-		return bytes_in
+	def update(self, bytes_len: int):
+		self.__processed_bytes_len += bytes_len
 
-	def __print(self):
+	def print(self):
 		p = ceil(self.__processed_bytes_len / self.__total_bytes_len * 100)
 		percentage = p if p <= 100 else 100
 		i = floor(percentage / 10)
