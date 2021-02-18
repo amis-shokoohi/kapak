@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Kapak | easy-to-use file encryption script</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+	<section id="logo">
+		<img src="/kapak_logo.png" alt="kapak logo" width="300px">
+	</section>
+
+	<nav>
+		<div class="w-100">
+			<a class="w-100 active" id="nav-link-encrypt" href="#tab-encrypt">Encrypt</a>
+		</div>
+		<div class="w-100">
+			<a class="w-100" id="nav-link-decrypt" href="#tab-decrypt">Decrypt</a>
+		</div>
+	</nav>
+
+	<!-- Encryption Tab -->
+	<section class="tab" id="tab-encrypt">
+		<form id="form-encrypt">
+			<!-- Target Type -->
+			<section class="wrapper mt-1 target-type">
+				<div class="radio w-100 mb-half">
+					<input type="radio" name="targetType" id="file-encrypt" value="file" checked>
+					<label class="w-100" for="file-encrypt">File</label>
+				</div>
+				<div class="radio w-100">
+					<input type="radio" name="targetType" id="folder-encrypt" value="folder">
+					<label class="w-100" for="folder-encrypt">Folder</label>
+				</div>
+			</section>
+			<!-- Browser -->
+			<section class="wrapper mt-1 browser">
+				<input class="w-100" type="text" value="No file chosen..." disabled>
+				<button class="btn">Browse</button>
+			</section>
+			<!-- Password -->
+			<section class="wrapper mt-1 password">
+				<label for="password-encrypt">Password:</label>
+				<input class="w-100" type="password" name="password" id="password-encrypt">
+			</section>
+			<!-- Options -->
+			<section class="wrapper mt-1 options">
+				<div class="mb-half" id="option-remove-encrypt">
+					<input type="checkbox" name="optionRemove" id="remove-encrypt">
+					<label for="remove-encrypt">Remove the file/folder after encryption</label>
+				</div>
+				<div id="option-zip-encrypt">
+					<input type="checkbox" name="optionZip" id="zip-encrypt">
+					<label for="zip-encrypt">Zip the folder before encryption</label>
+				</div>
+			</section>
+			<!-- Submit Button -->
+			<section class="wrapper submit">
+				<button type="submit" class="btn w-100">Encrypt</button>
+			</section>
+		</form>
+	</section>
+
+	<!-- Decryption Tab -->
+	<section class="tab" id="tab-decrypt">
+		<form id="form-decrypt">
+			<!-- Target Type -->
+			<section class="wrapper mt-1 target-type">
+				<div class="radio w-100 mb-half">
+					<input type="radio" name="targetType" id="file-decrypt" value="file" checked>
+					<label class="w-100" for="file-decrypt">File</label>
+				</div>
+				<div class="radio w-100">
+					<input type="radio" name="targetType" id="folder-decrypt" value="folder">
+					<label class="w-100" for="folder-decrypt">Folder</label>
+				</div>
+			</section>
+			<!-- Browser -->
+			<section class="wrapper mt-1 browser">
+				<input class="w-100" type="text" value="No file chosen..." disabled>
+				<button class="btn">Browse</button>
+			</section>
+			<!-- Password -->
+			<section class="wrapper mt-1 password">
+				<label for="password-decrypt">Password:</label>
+				<input class="w-100" type="password" name="password" id="password-decrypt">
+			</section>
+			<!-- Options -->
+			<section class="wrapper mt-1 options">
+				<div class="mb-half" id="option-remove-decrypt">
+					<input type="checkbox" name="optionRemove" id="remove-decrypt">
+					<label for="remove-decrypt">Remove the file/folder after decryption</label>
+				</div>
+				<div id="option-zip-decrypt">
+					<input type="checkbox" name="optionZip" id="zip-decrypt">
+					<label for="zip-decrypt">Zip the folder before decryption</label>
+				</div>
+			</section>
+			<!-- Submit Button -->
+			<section class="wrapper submit">
+				<button type="submit" class="btn w-100">Decrypt</button>
+			</section>
+		</form>
+	</section>
+
+	<script type="module" src="/main.js"></script>
+</body>
+</html>
