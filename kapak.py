@@ -24,5 +24,5 @@ if __name__ == '__main__':
 	except KeyboardInterrupt:
 		exit()
 	except Exception as err:
-		stderr.write('\r' + 40*' ' + '\r\nERROR: ' + str(err) + '\n')
+		stderr.write('\r' + 40*' ' + '\r\nERROR: ' + err.args[0] + '\n')
 		exit(1)

@@ -102,7 +102,7 @@ def encrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	for f in ff:
 		f_out_name = replace_file_ext(f, 'kpk')
 		if os.path.exists(f_out_name): # Overwrite error
-			raise Exception(f_out_name + ' already exists')
+			raise Exception(str(f_out_name) + ' already exists')
 		lib.encryptor.encrypt(key, salt, f, buffer_size)
 		if should_remove:
 			os.remove(f)

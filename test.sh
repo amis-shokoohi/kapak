@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-python -m unittest discover -p "*_test.py" -v
+python3 -m unittest discover -p "*_test.py" -v
 
 DATA='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et 
 dolore magna aliqua. Mus mauris vitae ultricies leo. Tempor nec feugiat nisl pretium fusce. Sollicitudin ac 
@@ -22,10 +22,10 @@ echo $DATA > $FILE_NAME
 FILE_HASH=$(sha256sum $FILE_NAME)
 
 echo 'password' > password.txt
-python kapak.py encrypt -r -b=1 $FILE_NAME
+python3 kapak.py encrypt -r -b=1 $FILE_NAME
 
 echo 'password' > password.txt
-python kapak.py decrypt -r -b=1 $FILE_NAME_KPK
+python3 kapak.py decrypt -r -b=1 $FILE_NAME_KPK
 
 if [[ $(sha256sum $FILE_NAME) != $FILE_HASH ]]; then
 	echo 'failed'
@@ -45,15 +45,15 @@ for i in {1..3}; do
 done
 
 echo 'password' > password.txt
-python kapak.py encrypt -r -b=1 $DIR_NAME
+python3 kapak.py encrypt -r -b=1 $DIR_NAME
 
 echo 'password' > password.txt
-python kapak.py decrypt -r -b=1 $DIR_NAME
+python3 kapak.py decrypt -r -b=1 $DIR_NAME
 
 echo 'password' > password.txt
-python kapak.py encrypt -rz -b=1 $DIR_NAME
+python3 kapak.py encrypt -rz -b=1 $DIR_NAME
 
 echo 'password' > password.txt
-python kapak.py decrypt -r -b=1 $DIR_NAME_KPK
+python3 kapak.py decrypt -r -b=1 $DIR_NAME_KPK
 
 rm -rf $DIR_NAME
