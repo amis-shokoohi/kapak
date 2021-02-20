@@ -1,13 +1,13 @@
-import { initEncryptTab } from '/encrypt.js';
-import { initDecryptTab } from '/decrypt.js';
+import { EncryptTab } from '/encrypt.js';
+import { DecryptTab } from '/decrypt.js';
 
 const navLinkEncrypt = document.getElementById('nav-link-encrypt');
 const navLinkDecrypt = document.getElementById('nav-link-decrypt');
 const tabEncrypt = document.getElementById('tab-encrypt');
 const tabDecrypt = document.getElementById('tab-decrypt');
 
-initEncryptTab();
-initDecryptTab();
+const encryptTab = new EncryptTab();
+const decryptTab = new DecryptTab();
 tabDecrypt.setAttribute('hidden', '');
 
 navLinkEncrypt.addEventListener('click', e => {
