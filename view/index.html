@@ -8,9 +8,7 @@
 	<link rel="stylesheet" href="/style.css">
 </head>
 <body>
-	<section id="logo">
-		<img src="/kapak_logo.png" alt="kapak logo" width="300px">
-	</section>
+	<div id="disable"></div>
 
 	<nav>
 		<div class="w-100">
@@ -26,11 +24,11 @@
 		<form id="form-encrypt">
 			<!-- Target Type -->
 			<section class="wrapper mt-1 target-type">
-				<div class="radio w-100 mb-half">
+				<div class="radio w-100">
 					<input type="radio" name="targetType" id="file-encrypt" value="file" checked>
 					<label class="w-100" for="file-encrypt">File</label>
 				</div>
-				<div class="radio w-100">
+				<div class="radio w-100 mt-half">
 					<input type="radio" name="targetType" id="folder-encrypt" value="folder">
 					<label class="w-100" for="folder-encrypt">Folder</label>
 				</div>
@@ -42,22 +40,28 @@
 			</section>
 			<!-- Password -->
 			<section class="wrapper mt-1 password">
-				<label for="password-encrypt">Password:</label>
-				<input class="w-100" type="password" name="password" id="password-encrypt">
+				<div>
+					<label for="password-encrypt">Password:</label>
+					<input class="w-100" type="password" name="password" id="password-encrypt">
+				</div>
+				<div class="mt-half">
+					<label for="retype-password-encrypt">Retype password:</label>
+					<input class="w-100" type="password" name="retypePassword" id="retype-password-encrypt">
+				</div>
 			</section>
 			<!-- Options -->
 			<section class="wrapper mt-1 options">
-				<div class="mb-half" id="option-remove-encrypt">
+				<div id="option-remove-encrypt">
 					<input type="checkbox" name="optionRemove" id="remove-encrypt">
 					<label for="remove-encrypt">Remove the file/folder after encryption</label>
 				</div>
-				<div id="option-zip-encrypt">
+				<div class="mt-half" id="option-zip-encrypt">
 					<input type="checkbox" name="optionZip" id="zip-encrypt">
 					<label for="zip-encrypt">Zip the folder before encryption</label>
 				</div>
 			</section>
 			<!-- Submit Button -->
-			<section class="wrapper submit">
+			<section class="wrapper mt-1 submit">
 				<button type="submit" class="btn w-100">Encrypt</button>
 			</section>
 		</form>
@@ -68,11 +72,11 @@
 		<form id="form-decrypt">
 			<!-- Target Type -->
 			<section class="wrapper mt-1 target-type">
-				<div class="radio w-100 mb-half">
+				<div class="radio w-100">
 					<input type="radio" name="targetType" id="file-decrypt" value="file" checked>
 					<label class="w-100" for="file-decrypt">File</label>
 				</div>
-				<div class="radio w-100">
+				<div class="radio w-100 mt-half">
 					<input type="radio" name="targetType" id="folder-decrypt" value="folder">
 					<label class="w-100" for="folder-decrypt">Folder</label>
 				</div>
@@ -84,27 +88,33 @@
 			</section>
 			<!-- Password -->
 			<section class="wrapper mt-1 password">
-				<label for="password-decrypt">Password:</label>
-				<input class="w-100" type="password" name="password" id="password-decrypt">
+				<div>
+					<label for="password-decrypt">Password:</label>
+					<input class="w-100" type="password" name="password" id="password-decrypt">
+				</div>
 			</section>
 			<!-- Options -->
 			<section class="wrapper mt-1 options">
-				<div class="mb-half" id="option-remove-decrypt">
+				<div id="option-remove-decrypt">
 					<input type="checkbox" name="optionRemove" id="remove-decrypt">
 					<label for="remove-decrypt">Remove the file/folder after decryption</label>
 				</div>
-				<div id="option-zip-decrypt">
-					<input type="checkbox" name="optionZip" id="zip-decrypt">
-					<label for="zip-decrypt">Zip the folder before decryption</label>
-				</div>
 			</section>
 			<!-- Submit Button -->
-			<section class="wrapper submit">
+			<section class="wrapper mt-1 submit">
 				<button type="submit" class="btn w-100">Decrypt</button>
 			</section>
 		</form>
 	</section>
 
+	<section id="logs" class="wrapper">
+		<label for="logs">logs</label>
+		<p id="message"></p>
+		<p id="error"></p>
+		<div class="mt-half"></div>
+	</section>
+
+	<script src="/util.js"></script>
 	<script type="module" src="/main.js"></script>
 </body>
 </html>

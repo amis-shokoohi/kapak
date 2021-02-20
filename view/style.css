@@ -29,8 +29,8 @@
 	margin-top: 1rem;
 }
 
-.mb-half {
-	margin-bottom: .5rem;
+.mt-half {
+	margin-top: .5rem;
 }
 
 .btn {
@@ -63,18 +63,22 @@
 	color: rgb(95, 20, 20);
 	box-shadow: 0px 0px 2px 4px rgba(255, 40, 40, 0.5);
 	border-radius: 4px;
-	width: 90%;
+	width: calc(100% - 2rem);
 	padding: .8rem;
 }
 
 body {
 	background-color: var(--bg-color);
 	color: var(--secondary-color);
+	overflow: hidden;
 }
 
-#logo {
-	display:flex;
-	justify-content:center;
+#disable {
+	position: absolute;
+	z-index: 1;
+	background-color: transparent;
+	width: 0%;
+	height: 0%;
 }
 
 nav {
@@ -106,10 +110,6 @@ nav .active {
 	background-color: #242424;
 	color: var(--primary-color);
 	border-bottom: solid 1px var(--primary-color);
-}
-
-.tab {
-	overflow: hidden;
 }
 
 section.target-type .radio {
@@ -158,10 +158,14 @@ section.browser input[type=text] {
 	margin-right: .6rem;
 }
 
-section.password {
+section.password div {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+}
+
+section.password label {
+	width: 24%;
 }
 
 section.password input[type=password] {
@@ -209,4 +213,46 @@ section.options input[type=checkbox]:checked {
 section.options label {
 	margin-left: .4rem;
 	cursor: pointer;
+}
+
+#logs {
+	position: absolute;
+	bottom: 1rem;
+	border: 1px solid #555;
+	border-radius: 4px;
+	margin: 1rem 1rem 0;
+	height: 80px;
+	width: calc(100% - 2rem);
+}
+
+#logs > label {
+	position: relative;
+	top: -10px;
+	background-color: var(--bg-color);
+	padding: 0 .4rem;
+}
+
+#error {
+	color: rgb(200, 50, 50);
+}
+
+#logs > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#logs > div #progressbar {
+	border: 1px solid #555;
+	border-radius: 4px;
+	height: 16px;
+}
+
+#logs > div #progressbar > div {
+	height: 100%;
+	background-color: var(--primary-color);
+}
+
+#logs > div #percentage {
+	margin-left: .6rem;
 }
