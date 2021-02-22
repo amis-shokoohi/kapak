@@ -4,7 +4,7 @@ import shutil
 
 import webview
 
-from lib.file_exntension import file_ext, replace_file_ext
+from lib.file_extension import file_ext, replace_file_ext
 from lib.progress import Progress
 from lib.passwd import derive_key
 from lib.constants import BUFFER_SIZE, ENCRYPT_MODE, TEMP_ZIP_EXT, DECRYPT_MODE

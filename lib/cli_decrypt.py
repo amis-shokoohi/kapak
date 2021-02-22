@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse
 
 from lib.message import print_help_decrypt
-from lib.file_exntension import file_ext
+from lib.file_extension import file_ext
 from lib.passwd import get_password
 from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, BUFFER_SIZE
 from lib.progress import Progress

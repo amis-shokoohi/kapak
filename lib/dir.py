@@ -3,7 +3,7 @@ from pathlib import Path
 import zipfile
 
 from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT
-from lib.file_exntension import file_ext
+from lib.file_extension import file_ext
 
 def calc_total_size(files: [Path]) -> int:
 	total_size = 0

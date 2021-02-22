@@ -4,12 +4,11 @@ from pathlib import Path
 import argparse
 
 from lib.message import print_help_encrypt
-from lib.file_exntension import file_ext
+from lib.file_extension import file_ext, replace_file_ext
 from lib.passwd import get_password, derive_key
 from lib.constants import ENCRYPT_MODE, BUFFER_SIZE
 from lib.progress import Progress
 import lib.encryptor
-from lib.file_exntension import replace_file_ext
 from lib.dir import zip_dir, calc_total_size, list_files
 
 def execute(argv: [str]):

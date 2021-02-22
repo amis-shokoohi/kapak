@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives import padding
 
 from lib.passwd import derive_key
 from lib.progress import Progress
-from lib.file_exntension import replace_file_ext
+from lib.file_extension import replace_file_ext
 from lib.pipeline import new_pipeline
 
 def decrypt(password: str, f_in_path: Path, buffer_size: int) -> (Path, str):
