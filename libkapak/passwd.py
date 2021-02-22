@@ -5,7 +5,7 @@ from sys import stderr
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.backends import default_backend
 
-from lib.constants import DECRYPT_MODE
+from libkapak.constants import DECRYPT_MODE
 
 def _ask_pass(mode: int) -> str:
 	password1 = getpass('Enter password: ')

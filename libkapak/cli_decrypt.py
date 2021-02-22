@@ -2,13 +2,13 @@ import os
 from pathlib import Path
 import argparse
 
-from lib.message import print_help_decrypt
-from lib.file_extension import file_ext
-from lib.passwd import get_password
-from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, BUFFER_SIZE
-from lib.progress import Progress
-import lib.decryptor
-from lib.dir import unzip_dir, calc_total_size, list_files
+from libkapak.message import print_help_decrypt
+from libkapak.file_extension import file_ext
+from libkapak.passwd import get_password
+from libkapak.constants import DECRYPT_MODE, TEMP_ZIP_EXT, BUFFER_SIZE
+from libkapak.progress import Progress
+import libkapak.decryptor
+from libkapak.dir import unzip_dir, calc_total_size, list_files
 
 def execute(argv: [str]):
 	if len(argv) == 2 or argv[2] == '-h' or argv[2] == '--help':
@@ -46,7 +46,7 @@ def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	print('\nDecrypting...\n')
 	progress = Progress()
 	progress.set_total_size(target_size)
-	f_out_path, f_out_ext = lib.decryptor.decrypt(password, target_path, buffer_size)
+	f_out_path, f_out_ext = libkapak.decryptor.decrypt(password, target_path, buffer_size)
 	if f_out_ext == TEMP_ZIP_EXT:
 		unzip_dir(f_out_path)
 		os.remove(f_out_path)
@@ -67,6 +67,6 @@ def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	progress = Progress()
 	progress.set_total_size(target_size)
 	for f in ff:
-		_, _ = lib.decryptor.decrypt(password, f, buffer_size)
+		_, _ = libkapak.decryptor.decrypt(password, f, buffer_size)
 		if should_remove:
 			os.remove(f)

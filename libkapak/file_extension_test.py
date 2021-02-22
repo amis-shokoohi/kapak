@@ -1,6 +1,7 @@
 import unittest
-from lib.file_extension import file_ext, replace_file_ext
 from pathlib import Path
+
+from libkapak.file_extension import file_ext, replace_file_ext
 
 class TestFileExtension(unittest.TestCase):
 	def test_file_ext(self):

@@ -3,8 +3,9 @@ import os
 import shutil
 from pathlib import Path
 import zipfile
-from lib.dir import calc_total_size, list_files, zip_dir, unzip_dir
-from lib.constants import ENCRYPT_MODE, DECRYPT_MODE, TEMP_ZIP_EXT
+
+from libkapak.dir import calc_total_size, list_files, zip_dir, unzip_dir
+from libkapak.constants import ENCRYPT_MODE, DECRYPT_MODE, TEMP_ZIP_EXT
 
 class TestDir_CalcTotalSize(unittest.TestCase):
 	def setUp(self):
