@@ -1,1 +1,2 @@
 cryptography>=3.2
+pywebview>=3.4
