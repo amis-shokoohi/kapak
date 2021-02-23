@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import shutil
+import sys
 
 import webview
 
@@ -219,9 +220,18 @@ class App():
 			self.js_enable_form()
 
 if __name__ == '__main__':
+	base_dir = os.path.dirname(os.path.realpath(__file__))
+
+	# Code to fix pyinstaller problem with finding view directory
+	if hasattr(sys, '_MEIPASS'):
+		base_dir = sys._MEIPASS
+
+	view_path = Path(os.path.join(base_dir, 'viewkapak/index.html'))
+	assert os.path.exists(view_path), 'not able to find viewkapak directory'
+
 	app = App()
 	window = webview.create_window(
-		title='KapaK', url='./view/index.html', js_api=app,
+		title='kapak', url=view_path, js_api=app,
 		width=400, height=580, resizable=False
 	)
 	webview.start(http_server=True)
