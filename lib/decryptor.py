@@ -5,10 +5,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
-from libkapak.passwd import derive_key
-from libkapak.progress import Progress
-from libkapak.file_extension import replace_file_ext
-from libkapak.pipeline import new_pipeline
+from lib.passwd import derive_key
+from lib.progress import Progress
+from lib.file_extension import replace_file_ext
+from lib.pipeline import new_pipeline
 
 def decrypt(password: str, f_in_path: Path, buffer_size: int) -> (Path, str):
 	header = _read_header(f_in_path)

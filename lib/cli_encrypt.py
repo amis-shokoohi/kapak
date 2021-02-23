@@ -3,13 +3,13 @@ import shutil
 from pathlib import Path
 import argparse
 
-from libkapak.message import print_help_encrypt
-from libkapak.file_extension import file_ext, replace_file_ext
-from libkapak.passwd import get_password, derive_key
-from libkapak.constants import ENCRYPT_MODE, BUFFER_SIZE
-from libkapak.progress import Progress
-import libkapak.encryptor
-from libkapak.dir import zip_dir, calc_total_size, list_files
+from lib.message import print_help_encrypt
+from lib.file_extension import file_ext, replace_file_ext
+from lib.passwd import get_password, derive_key
+from lib.constants import ENCRYPT_MODE, BUFFER_SIZE
+from lib.progress import Progress
+import lib.encryptor
+from lib.dir import zip_dir, calc_total_size, list_files
 
 def execute(argv: [str]):
 	if len(argv) == 2 or argv[2] == '-h' or argv[2] == '--help':
@@ -55,7 +55,7 @@ def encrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	progress = Progress()
 	progress.set_total_size(target_size)
 	key, salt = derive_key(password, None)
-	libkapak.encryptor.encrypt(key, salt, target_path, buffer_size)
+	lib.encryptor.encrypt(key, salt, target_path, buffer_size)
 
 	if should_remove:
 		os.remove(target_path)
@@ -77,7 +77,7 @@ def zip_dir_then_encrypt(target_path: Path, should_remove: bool, buffer_size: in
 	progress = Progress()
 	progress.set_total_size(target_size)
 	key, salt = derive_key(password, None)
-	libkapak.encryptor.encrypt(key, salt, zp, buffer_size)
+	lib.encryptor.encrypt(key, salt, zp, buffer_size)
 	os.remove(zp)
 
 	if should_remove:
@@ -102,6 +102,6 @@ def encrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 		f_out_name = replace_file_ext(f, 'kpk')
 		if os.path.exists(f_out_name): # Overwrite error
 			raise Exception(str(f_out_name) + ' already exists')
-		libkapak.encryptor.encrypt(key, salt, f, buffer_size)
+		lib.encryptor.encrypt(key, salt, f, buffer_size)
 		if should_remove:
 			os.remove(f)

@@ -1,7 +1,7 @@
 from typing import Callable, BinaryIO
 from functools import partial
 
-from libkapak.progress import Progress
+from lib.progress import Progress
 
 def new_pipeline(buffer_size: int) -> Callable:
 	def pipeline(

@@ -1,8 +1,8 @@
 from sys import argv, exit, stderr
 
-from libkapak.message import print_description, print_help, print_version
-import libkapak.cli_encrypt
-import libkapak.cli_decrypt
+from lib.message import print_description, print_help, print_version
+import lib.cli_encrypt
+import lib.cli_decrypt
 
 def main():
 	if len(argv) == 1:
@@ -12,9 +12,9 @@ def main():
 	elif argv[1] == '-v' or argv[1] == '--version':
 		print_version()
 	elif argv[1] == 'encrypt':
-		libkapak.cli_encrypt.execute(argv)
+		lib.cli_encrypt.execute(argv)
 	elif argv[1] == 'decrypt':
-		libkapak.cli_decrypt.execute(argv)
+		lib.cli_decrypt.execute(argv)
 	else:
 		print_help()
 

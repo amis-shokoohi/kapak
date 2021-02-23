@@ -5,13 +5,13 @@ import sys
 
 import webview
 
-from libkapak.file_extension import file_ext, replace_file_ext
-from libkapak.progress import Progress
-from libkapak.passwd import derive_key
-from libkapak.constants import BUFFER_SIZE, ENCRYPT_MODE, TEMP_ZIP_EXT, DECRYPT_MODE
-from libkapak.dir import zip_dir, unzip_dir, list_files, calc_total_size
-import libkapak.encryptor
-import libkapak.decryptor
+from lib.file_extension import file_ext, replace_file_ext
+from lib.progress import Progress
+from lib.passwd import derive_key
+from lib.constants import BUFFER_SIZE, ENCRYPT_MODE, TEMP_ZIP_EXT, DECRYPT_MODE
+from lib.dir import zip_dir, unzip_dir, list_files, calc_total_size
+import lib.encryptor
+import lib.decryptor
 
 class App():
 	def __init__(self):
@@ -78,7 +78,7 @@ class App():
 
 			self.js_log_msg('Encrypting...')
 			key, salt = derive_key(password, None)
-			libkapak.encryptor.encrypt(key, salt, self.path, self.buffer_size)
+			lib.encryptor.encrypt(key, salt, self.path, self.buffer_size)
 
 			if should_remove:
 				os.remove(self.path)
@@ -110,7 +110,7 @@ class App():
 
 			self.js_log_msg('Encrypting...')
 			key, salt = derive_key(password, None)
-			libkapak.encryptor.encrypt(key, salt, zp, self.buffer_size)
+			lib.encryptor.encrypt(key, salt, zp, self.buffer_size)
 			os.remove(zp)
 
 			if should_remove:
@@ -145,7 +145,7 @@ class App():
 				f_out_name = replace_file_ext(f, 'kpk')
 				if os.path.exists(f_out_name): # Overwrite error
 					raise Exception(f_out_name.name + ' already exists')
-				libkapak.encryptor.encrypt(key, salt, f, self.buffer_size)
+				lib.encryptor.encrypt(key, salt, f, self.buffer_size)
 				if should_remove:
 					os.remove(f)
 
@@ -172,7 +172,7 @@ class App():
 			self.progress.set_total_size(target_size)
 
 			self.js_log_msg('Decrypting...')
-			f_out_path, f_out_ext = libkapak.decryptor.decrypt(password, self.path, self.buffer_size)
+			f_out_path, f_out_ext = lib.decryptor.decrypt(password, self.path, self.buffer_size)
 			if f_out_ext == TEMP_ZIP_EXT:
 				unzip_dir(f_out_path)
 				os.remove(f_out_path)
@@ -205,7 +205,7 @@ class App():
 			self.progress.set_total_size(target_size)
 
 			for f in ff:
-				_, _ = libkapak.decryptor.decrypt(password, f, self.buffer_size)
+				_, _ = lib.decryptor.decrypt(password, f, self.buffer_size)
 				if should_remove:
 					os.remove(f)
 
@@ -226,8 +226,8 @@ if __name__ == '__main__':
 	if hasattr(sys, '_MEIPASS'):
 		base_dir = sys._MEIPASS
 
-	view_path = Path(os.path.join(base_dir, 'viewkapak/index.html'))
-	assert os.path.exists(view_path), 'not able to find viewkapak directory'
+	view_path = Path(os.path.join(base_dir, 'view/index.html'))
+	assert os.path.exists(view_path), 'not able to find view directory'
 
 	app = App()
 	window = webview.create_window(
