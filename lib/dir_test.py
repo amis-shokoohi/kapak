@@ -69,7 +69,7 @@ class TestDir_ZipDir(unittest.TestCase):
 		zp = zip_dir(self.temp_dir_name)
 		self.assertTrue(zipfile.is_zipfile(zp))
 		with zipfile.ZipFile(zp, mode='r') as zf:
-			self.assertListEqual([Path(f) for f in zf.namelist()], self.ff)
+			self.assertListEqual([Path(f) for f in sorted(zf.namelist())], self.ff)
 		os.remove(zp)
 
 	def tearDown(self):
@@ -96,7 +96,7 @@ class TestDir_ZipDir2(unittest.TestCase):
 		zp = zip_dir(self.inner_temp_dir_path)
 		self.assertTrue(zipfile.is_zipfile(zp))
 		with zipfile.ZipFile(zp, mode='r') as zf:
-			self.assertListEqual([Path(f) for f in zf.namelist()], self.ff)
+			self.assertListEqual([Path(f) for f in sorted(zf.namelist())], self.ff)
 		os.remove(zp)
 
 	def tearDown(self):
@@ -118,7 +118,7 @@ class TestDir_UnzipDir(unittest.TestCase):
 	def test_unzip_dir(self):
 		unzip_dir(self.zp)
 		self.assertTrue(os.path.isdir(self.temp_dir_name))
-		self.assertListEqual(list(self.temp_dir_name.rglob('*')), self.ff)
+		self.assertListEqual(sorted(list(self.temp_dir_name.rglob('*'))), self.ff)
 
 	def tearDown(self):
 		shutil.rmtree(self.temp_dir_name)
