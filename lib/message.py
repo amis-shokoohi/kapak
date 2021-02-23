@@ -1,9 +1,12 @@
+from lib.constants import VERSION
+
 def print_description():
 	print(LOGO)
 	print(DESCRIPTION)
 
 def print_version():
-	print(VERSION)
+	v = '\nkapak {version}\n'.format(version=VERSION)
+	print(v)
 
 def print_help():
 	print(USAGE)
@@ -14,17 +17,13 @@ def print_help_encrypt():
 def print_help_decrypt():
 	print(USAGE_DECRYPT)
 
-_VERSION = 'v3.0.1'
-
 LOGO = '\n\
     ▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ \n\
     █▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪\n\
     ▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·\n\
     ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    {version}\n\
     ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀\n\
-'.format(version=_VERSION)
-
-VERSION = '\nkapak {version}\n'.format(version=_VERSION)
+'.format(version=VERSION)
 
 DESCRIPTION = '\
 Description: A simple-to-use file encryption script which\n\
