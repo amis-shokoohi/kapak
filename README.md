@@ -1,4 +1,4 @@
-# KapaK: A simple-to-use file encryption script
+# Kapak: A simple-to-use file encryption script
 ```
 $ kapak
 
@@ -16,7 +16,7 @@ Help:        kapak [ -h | --help ]
 ```
 
 ## Description
-Kapak can encrypt/decrypt **file/folder** by<br>
+Kapak can encrypt/decrypt **files and folders** by<br>
 a given password using _AES_ symmetric encryption methods.
 
 > If you are wondering what _kapak_ means, it means _mold_.<br>
@@ -37,13 +37,12 @@ Install requirements:
 ```
 $ pip3 install -r requirements.txt
 ```
-Then run the installation script as **root** user. It will copy files into `/bin/kapak` directory and add it to the `PATH`:
+Then run the installation script as **root** user:
 ```
 $ cd kapak
 $ chmod +x ./install.sh
 $ sudo ./install.sh
 ```
-> NOTE: I've only tested this on Debian based distros.
 ### Windows
 Download zipfile from [here](https://github.com/amis-shokoohi/kapak/releases/download/v3.1.0/kapak-windows-v3.1.0.zip).<br>
 You can use `kapak.exe` now, but if you want to run it from anywhere in your system, follow instruction below:
@@ -51,13 +50,16 @@ You can use `kapak.exe` now, but if you want to run it from anywhere in your sys
 - Add `C:\PROGRA~1\kapak` to `Path` environment variable.
 
 ## Usage
-You can either use the GUI ( Grpahic User Interface ) or the CLI ( Command Line Interface ):<br>
+You can either use the GUI ( Grpahic User Interface ) or the CLI ( Command Line Interface ) version of Kapak:<br>
+### GUI
 To use the GUI in Windows just search `kapak-gui` in the searchbar.<br>
-To use the GUI in Linux run:
-```
-$ kapak-gui
-```
-To use the CLI:
+To use the GUI in Linux run `kapak-gui` in the terminal.
+<p align="center">
+	<img src="screenshots/kapak-gui-encrypt.png" alt="kapak-gui encrypt" width="260">
+	<img src="screenshots/kapak-gui-decrypt.png" alt="kapak-gui decrypt" width="260">
+</p>
+
+### CLI
 ```
 $ kapak -h
 
