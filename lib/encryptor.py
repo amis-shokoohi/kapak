@@ -8,9 +8,9 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
 from lib.file_extension import file_ext, replace_file_ext
-from lib.pipeline import new_pipeline
+from lib.progress import Progress
 
-def encrypt(key: bytes, salt: bytes, f_in_path: Path, buffer_size: int):
+def encrypt(key: bytes, salt: bytes, f_in_path: Path, buffer_size: int, progress: Progress):
 	ext = file_ext(f_in_path)
 	if len(ext) > 11:
 		raise Exception('unable to encrypt files with extension longer than 11B')
@@ -28,17 +28,16 @@ def encrypt(key: bytes, salt: bytes, f_in_path: Path, buffer_size: int):
 		'cipher_ext': encryptor.update(_pad_ext(bytes(ext, 'utf-8')))
 	}
 	f_out_path = replace_file_ext(f_in_path, 'kpk')
-	pipeline = new_pipeline(buffer_size)
 	
 	with open(f_in_path, 'rb') as fd_in:
 		with open(f_out_path, 'wb') as fd_out:
 			_write_header(fd_out, header)
-			pipeline(
-				fd_in,
-				_pad_bytes,
-				encryptor.update,
-				fd_out
-			)
+			for chunk in iter(partial(fd_in.read, buffer_size), b''):
+				progress.update(len(chunk))
+				chunk = _pad_bytes(chunk)
+				chunk = encryptor.update(chunk)
+				fd_out.write(chunk)
+				progress.print()
 			fd_out.write(encryptor.finalize())
 
 def _pad_bytes(bytes_in: bytes) -> bytes:

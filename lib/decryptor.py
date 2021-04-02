@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Dict
+from functools import partial
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -8,9 +9,9 @@ from cryptography.hazmat.primitives import padding
 from lib.passwd import derive_key
 from lib.progress import Progress
 from lib.file_extension import replace_file_ext
-from lib.pipeline import new_pipeline
+from lib.constants import HEADER_SIZE
 
-def decrypt(password: str, f_in_path: Path, buffer_size: int) -> (Path, str):
+def decrypt(password: str, f_in_path: Path, buffer_size: int, progress: Progress) -> (Path, str):
 	header = _read_header(f_in_path)
 	key, _ = derive_key(password, header['salt'])
 	decryptor = Cipher(
@@ -22,17 +23,15 @@ def decrypt(password: str, f_in_path: Path, buffer_size: int) -> (Path, str):
 	f_out_ext = _unpad_ext(decryptor.update(header['cipher_ext']))
 	f_out_path = replace_file_ext(f_in_path, f_out_ext)
 	
-	pipeline = new_pipeline(buffer_size)
-	
 	with open(f_in_path, 'rb') as fd_in:
 		fd_in.seek(48) # Skip the header
 		with open(f_out_path, 'wb') as fd_out:
-			pipeline(
-				fd_in,
-				decryptor.update,
-				_unpad_bytes,
-				fd_out
-			)
+			for chunk in iter(partial(fd_in.read, buffer_size), b''):
+				progress.update(len(chunk))
+				chunk = decryptor.update(chunk)
+				chunk = _unpad_bytes(chunk)
+				fd_out.write(chunk)
+				progress.print()
 			fd_out.write(decryptor.finalize())
 	
 	return f_out_path, f_out_ext
@@ -59,14 +58,10 @@ def _unpad_ext(ext: bytes) -> str:
 
 def _read_header(f_in_path: Path) -> Dict[str, bytes]:
 	header = b''
-	header_len = 48
 	with open(f_in_path, 'rb') as fd_in:
-		header = fd_in.read(header_len)
-	progress = Progress.get_instance()
-	progress.update(header_len)
+		header = fd_in.read(HEADER_SIZE)
 	return {
 		'iv': header[0:16],
 		'salt': header[16:32],
 		'cipher_ext': header[32:64]
 	}
-	
