@@ -6,9 +6,9 @@ import sys
 import webview
 
 from lib.file_extension import file_ext, replace_file_ext
-from lib.progress import Progress
+from lib.progress_gui import ProgressGUI
 from lib.passwd import derive_key
-from lib.constants import BUFFER_SIZE, ENCRYPT_MODE, TEMP_ZIP_EXT, DECRYPT_MODE
+from lib.constants import BUFFER_SIZE, ENCRYPT_MODE, TEMP_ZIP_EXT, DECRYPT_MODE, HEADER_SIZE
 from lib.dir import zip_dir, unzip_dir, list_files, calc_total_size
 import lib.encryptor
 import lib.decryptor
@@ -17,8 +17,6 @@ class App():
 	def __init__(self):
 		self.buffer_size = BUFFER_SIZE * 1024 * 1024
 		self.path = Path('')
-		self.progress = Progress(True)
-		self.progress.set_print_fn(self.js_show_progress)
 
 	def open_file_dialog(self):
 		result = window.create_file_dialog()
@@ -45,9 +43,6 @@ class App():
 	def js_log_error(self, err):
 		window.evaluate_js(fr"logError('{err}')")
 
-	def js_show_progress(self, percentage):
-		window.evaluate_js(fr"showProgress({percentage})")
-
 	def js_clear_logs(self):
 		window.evaluate_js(fr"clearLogs()")
 
@@ -56,7 +51,6 @@ class App():
 			raise Exception('no file/folder chosen')
 		if not os.path.exists(self.path):
 			raise Exception('can not find ' + self.path.name)
-
 		if password == '' or len(password) < 3 or len(password) > 1024:
 			raise Exception('password should be at least 3 characters')
 
@@ -74,11 +68,12 @@ class App():
 			target_size = os.stat(self.path).st_size
 			if target_size == 0:
 				raise Exception(self.path.name + ' is empty')
-			self.progress.set_total_size(target_size)
+
+			progress = ProgressGUI(target_size, window)
 
 			self.js_log_msg('Encrypting...')
 			key, salt = derive_key(password, None)
-			lib.encryptor.encrypt(key, salt, self.path, self.buffer_size)
+			lib.encryptor.encrypt(key, salt, self.path, self.buffer_size, progress)
 
 			if should_remove:
 				os.remove(self.path)
@@ -90,7 +85,6 @@ class App():
 			self.js_clear_logs()
 			self.js_log_error(err.args[0])
 		finally:
-			self.progress.reset()
 			self.js_enable_form()
 	
 	def zip_folder_then_encrypt(self, password, should_remove):
@@ -106,11 +100,12 @@ class App():
 			target_size = os.stat(zp).st_size
 			if target_size == 0:
 				raise Exception(self.path.name + ' is empty')
-			self.progress.set_total_size(target_size)
+			
+			progress = ProgressGUI(target_size, window)
 
 			self.js_log_msg('Encrypting...')
 			key, salt = derive_key(password, None)
-			lib.encryptor.encrypt(key, salt, zp, self.buffer_size)
+			lib.encryptor.encrypt(key, salt, zp, self.buffer_size, progress)
 			os.remove(zp)
 
 			if should_remove:
@@ -123,7 +118,6 @@ class App():
 			self.js_clear_logs()
 			self.js_log_error(err.args[0])
 		finally:
-			self.progress.reset()
 			self.js_enable_form()
 
 	def encrypt_folder(self, password, should_remove):
@@ -137,7 +131,8 @@ class App():
 			target_size = calc_total_size(ff)
 			if target_size == 0:
 				raise Exception(self.path.name + ' is empty')
-			self.progress.set_total_size(target_size)
+			
+			progress = ProgressGUI(target_size, window)
 
 			self.js_log_msg('Encrypting...')
 			key, salt = derive_key(password, None)
@@ -145,7 +140,7 @@ class App():
 				f_out_name = replace_file_ext(f, 'kpk')
 				if os.path.exists(f_out_name): # Overwrite error
 					raise Exception(f_out_name.name + ' already exists')
-				lib.encryptor.encrypt(key, salt, f, self.buffer_size)
+				lib.encryptor.encrypt(key, salt, f, self.buffer_size, progress)
 				if should_remove:
 					os.remove(f)
 
@@ -156,7 +151,6 @@ class App():
 			self.js_clear_logs()
 			self.js_log_error(err.args[0])
 		finally:
-			self.progress.reset()
 			self.js_enable_form()
 
 	def decrypt_file(self, password, should_remove):
@@ -169,10 +163,11 @@ class App():
 			target_size = os.stat(self.path).st_size
 			if target_size == 0:
 				raise Exception(self.path.name + ' is empty')
-			self.progress.set_total_size(target_size)
+
+			progress = ProgressGUI(target_size - HEADER_SIZE, window)
 
 			self.js_log_msg('Decrypting...')
-			f_out_path, f_out_ext = lib.decryptor.decrypt(password, self.path, self.buffer_size)
+			f_out_path, f_out_ext = lib.decryptor.decrypt(password, self.path, self.buffer_size, progress)
 			if f_out_ext == TEMP_ZIP_EXT:
 				unzip_dir(f_out_path)
 				os.remove(f_out_path)
@@ -187,7 +182,6 @@ class App():
 			self.js_clear_logs()
 			self.js_log_error(err.args[0])
 		finally:
-			self.progress.reset()
 			self.js_enable_form()
 
 	def decrypt_folder(self, password, should_remove):
@@ -202,10 +196,11 @@ class App():
 			target_size = calc_total_size(ff)
 			if target_size == 0:
 				raise Exception(self.path.name + ' is empty')
-			self.progress.set_total_size(target_size)
+
+			progress = ProgressGUI(target_size - len(ff) * HEADER_SIZE, window)
 
 			for f in ff:
-				_, _ = lib.decryptor.decrypt(password, f, self.buffer_size)
+				_, _ = lib.decryptor.decrypt(password, f, self.buffer_size, progress)
 				if should_remove:
 					os.remove(f)
 
@@ -216,7 +211,6 @@ class App():
 			self.js_clear_logs()
 			self.js_log_error(err.args[0])
 		finally:
-			self.progress.reset()
 			self.js_enable_form()
 
 if __name__ == '__main__':

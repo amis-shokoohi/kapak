@@ -5,8 +5,8 @@ import argparse
 from lib.message import print_help_decrypt
 from lib.file_extension import file_ext
 from lib.passwd import get_password
-from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, BUFFER_SIZE
-from lib.progress import Progress
+from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, BUFFER_SIZE, HEADER_SIZE
+from lib.progress_cli import ProgressCLI
 import lib.decryptor
 from lib.dir import unzip_dir, calc_total_size, list_files
 
@@ -44,9 +44,9 @@ def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	password = get_password(DECRYPT_MODE)		
 
 	print('\nDecrypting...\n')
-	progress = Progress()
-	progress.set_total_size(target_size)
-	f_out_path, f_out_ext = lib.decryptor.decrypt(password, target_path, buffer_size)
+	progress = ProgressCLI(target_size - 48)
+
+	f_out_path, f_out_ext = lib.decryptor.decrypt(password, target_path, buffer_size, progress)
 	if f_out_ext == TEMP_ZIP_EXT:
 		unzip_dir(f_out_path)
 		os.remove(f_out_path)
@@ -61,12 +61,14 @@ def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	ff = list_files(target_path, DECRYPT_MODE) # List of files in the directory
 	if len(ff) == 0:
 		raise Exception(str(target_path) + ' is empty')
+
 	target_size = calc_total_size(ff)
 	if target_size == 0:
 		raise Exception(str(target_path) + ' is empty')
-	progress = Progress()
-	progress.set_total_size(target_size)
+
+	progress = ProgressCLI(target_size - len(ff) * HEADER_SIZE)
+
 	for f in ff:
-		_, _ = lib.decryptor.decrypt(password, f, buffer_size)
+		_, _ = lib.decryptor.decrypt(password, f, buffer_size, progress)
 		if should_remove:
 			os.remove(f)
