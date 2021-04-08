@@ -45,18 +45,17 @@ def get_password(mode: int) -> str:
 
 	return password
 
-# Needs at least 256MB of RAM
-# Takes about a second to derive a key
 def derive_key(password: str, salt: bytes) -> (bytes, bytes):
 	password = bytes(password, 'utf-8')
 	if not salt:
 		salt = urandom(16)
+	# Requires 256MB of RAM
 	kdf = Scrypt(
 		salt=salt,
 		length=32,
-		n=2**16,
-		r=32,
-		p=1,
+		n=2**16, # number of iterations
+		r=32, # block size
+		p=1, # number of threads
 		backend=default_backend()
 	)
 	key = kdf.derive(password)
