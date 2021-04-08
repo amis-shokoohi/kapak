@@ -3,28 +3,14 @@ import shutil
 from pathlib import Path
 import argparse
 
-from lib.message import print_help_encrypt
 from lib.file_extension import file_ext, replace_file_ext
 from lib.passwd import get_password, derive_key
-from lib.constants import ENCRYPT_MODE, BUFFER_SIZE
+from lib.constants import ENCRYPT_MODE
 from lib.progress_cli import ProgressCLI
 import lib.encryptor
 from lib.dir import zip_dir, calc_total_size, list_files
 
-def execute(argv: [str]):
-	if len(argv) == 2 or argv[2] == '-h' or argv[2] == '--help':
-		print_help_encrypt()
-		return
-
-	parser = argparse.ArgumentParser(prog='kapak', add_help=False)
-	subparser = parser.add_subparsers()
-	subparser_encrypt_cmd = subparser.add_parser('encrypt', add_help=False)
-	subparser_encrypt_cmd.add_argument('-z', '--zip', action='store_true', dest='should_zip')
-	subparser_encrypt_cmd.add_argument('-r', '--remove', action='store_true', dest='should_remove')
-	subparser_encrypt_cmd.add_argument('-b', '--buffer-size', nargs='?', type=int, default=BUFFER_SIZE, dest='buffer_size')
-	subparser_encrypt_cmd.add_argument('path', type=Path)
-	args = subparser_encrypt_cmd.parse_args(args=argv[2:])
-
+def execute(args: argparse.Namespace):
 	args.buffer_size = args.buffer_size * 1024 * 1024 # ?MB
 	if not os.path.exists(args.path):
 		raise Exception('can not find ' + str(args.path))

@@ -2,27 +2,14 @@ import os
 from pathlib import Path
 import argparse
 
-from lib.message import print_help_decrypt
 from lib.file_extension import file_ext
 from lib.passwd import get_password
-from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, BUFFER_SIZE, HEADER_SIZE
+from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, HEADER_SIZE
 from lib.progress_cli import ProgressCLI
 import lib.decryptor
 from lib.dir import unzip_dir, calc_total_size, list_files
 
-def execute(argv: [str]):
-	if len(argv) == 2 or argv[2] == '-h' or argv[2] == '--help':
-		print_help_decrypt()
-		return
-
-	parser = argparse.ArgumentParser(prog='kapak', add_help=False)
-	subparser = parser.add_subparsers()
-	subparser_decrypt_cmd = subparser.add_parser('decrypt', add_help=False)
-	subparser_decrypt_cmd.add_argument('-r', '--remove', action='store_true', dest='should_remove')
-	subparser_decrypt_cmd.add_argument('-b', '--buffer-size', nargs='?', type=int, default=BUFFER_SIZE, dest='buffer_size')
-	subparser_decrypt_cmd.add_argument('path', type=Path)
-	args = subparser_decrypt_cmd.parse_args(args=argv[2:])
-
+def execute(args: argparse.Namespace):
 	args.buffer_size = args.buffer_size * 1024 * 1024 # ?MB
 	if not os.path.exists(args.path):
 		raise Exception('can not find ' + str(args.path))
