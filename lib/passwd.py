@@ -1,11 +1,24 @@
-from os import path, remove, urandom
+from os import path, remove
 from getpass import getpass
 from sys import stderr
 
-from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-from cryptography.hazmat.backends import default_backend
-
 from lib.constants import DECRYPT_MODE
+
+def get_password(mode: int) -> str:
+	password = None
+	# Read the password from password.txt file
+	f = 'password.txt'
+	if path.exists(f):
+		with open(f, 'r') as passwd_file:
+			password = str(passwd_file.read())
+		remove(f)
+	else: # Prompt user to enter the password
+		password = _ask_pass(mode)
+	
+	while not _is_correct_pass_length(password):
+		password = _ask_pass(mode)
+
+	return password
 
 def _ask_pass(mode: int) -> str:
 	password1 = getpass('Enter password: ')
@@ -28,35 +41,3 @@ def _is_correct_pass_length(password: str) -> bool:
 		stderr.write('\nERROR: password is to long\n\n')
 		return False
 	return True
-
-def get_password(mode: int) -> str:
-	password = None
-	# Read the password from password.txt file
-	f = 'password.txt'
-	if path.exists(f):
-		with open(f, 'r') as passwd_file:
-			password = str(passwd_file.read())
-		remove(f)
-	else: # Prompt user to enter the password
-		password = _ask_pass(mode)
-	
-	while not _is_correct_pass_length(password):
-		password = _ask_pass(mode)
-
-	return password
-
-def derive_key(password: str, salt: bytes) -> (bytes, bytes):
-	password = bytes(password, 'utf-8')
-	if not salt:
-		salt = urandom(16)
-	# Requires 256MB of RAM
-	kdf = Scrypt(
-		salt=salt,
-		length=32,
-		n=2**16, # number of iterations
-		r=32, # block size
-		p=1, # number of threads
-		backend=default_backend()
-	)
-	key = kdf.derive(password)
-	return (key, salt)
