@@ -18,7 +18,7 @@ def main():
 		if len(argv) == 2 or argv[2] == '-h' or argv[2] == '--help':
 			lib.message.print_help_encrypt()
 			return
-		parser = argparse.ArgumentParser(prog="kapak encrypt", add_help=False)
+		parser = argparse.ArgumentParser(prog='kapak encrypt', add_help=False)
 		parser.add_argument('-z', '--zip', action='store_true', dest='should_zip')
 		parser.add_argument('-r', '--remove', action='store_true', dest='should_remove')
 		parser.add_argument('-b', '--buffer-size', nargs='?', type=int, default=BUFFER_SIZE, dest='buffer_size')
