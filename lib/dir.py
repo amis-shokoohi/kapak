@@ -15,7 +15,7 @@ def list_files(dir_path: Path, mode: int) -> [Path]:
 	if mode == DECRYPT_MODE:
 		return list(dir_path.rglob('*.kpk'))
 	return list(filter(
-		lambda f: os.path.isfile(f) and file_ext(f) != 'kpk',
+		lambda f: os.path.isfile(f) and os.stat(f).st_size != 0,
 		list(dir_path.rglob('*'))
 	))
 

@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives import padding
 from lib.file_extension import file_ext, replace_file_ext
 from lib.progress import Progress
 
-def encrypt(key: bytes, salt: bytes, f_in_path: Path, buffer_size: int, progress: Progress):
+def encrypt(f_in_path: Path, key: bytes, salt: bytes, buffer_size: int, progress: Progress):
 	ext = file_ext(f_in_path)
 	if len(ext) > 11:
 		raise Exception('unable to encrypt files with extension longer than 11B')

@@ -4,7 +4,8 @@ from pathlib import Path
 import argparse
 
 from lib.file_extension import file_ext, replace_file_ext
-from lib.passwd import get_password, derive_key
+from lib.passwd import get_password
+from lib.key import derive_key
 from lib.constants import ENCRYPT_MODE
 from lib.progress_cli import ProgressCLI
 import lib.encryptor
@@ -24,24 +25,20 @@ def execute(args: argparse.Namespace):
 	print() # Prints new line
 
 def encrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
-	if file_ext(target_path) == 'kpk':
-		raise Exception('can not encrypt ' + str(target_path))
+	target_size = os.stat(target_path).st_size
+	if target_size == 0:
+		raise Exception(str(target_path) + ' is empty')
 
 	f_out_name = replace_file_ext(target_path, 'kpk')
 	if os.path.exists(f_out_name): # Overwrite error
 		raise Exception(str(f_out_name) + ' already exists')
 
-	target_size = os.stat(target_path).st_size
-	if target_size == 0:
-		raise Exception(str(target_path) + ' is empty')
-
 	password = get_password(ENCRYPT_MODE)
+	key, salt = derive_key(password, None)
 
 	print('\nEncrypting...\n')
 	progress = ProgressCLI(target_size)
-	key, salt = derive_key(password, None)
-	
-	lib.encryptor.encrypt(key, salt, target_path, buffer_size, progress)
+	lib.encryptor.encrypt(target_path, key, salt, buffer_size, progress)
 
 	if should_remove:
 		os.remove(target_path)
@@ -52,6 +49,7 @@ def zip_dir_then_encrypt(target_path: Path, should_remove: bool, buffer_size: in
 		raise Exception(f_out_name + ' already exists')
 
 	password = get_password(ENCRYPT_MODE)
+	key, salt = derive_key(password, None)
 
 	print('\nZipping...')
 	zp = zip_dir(target_path) # Creates a temporary zip file
@@ -61,16 +59,15 @@ def zip_dir_then_encrypt(target_path: Path, should_remove: bool, buffer_size: in
 
 	print('\nEncrypting...\n')
 	progress = ProgressCLI(target_size)
-	key, salt = derive_key(password, None)
+	lib.encryptor.encrypt(zp, key, salt, buffer_size, progress)
 
-	lib.encryptor.encrypt(key, salt, zp, buffer_size, progress)
 	os.remove(zp)
-
 	if should_remove:
 		shutil.rmtree(target_path)
 
 def encrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	password = get_password(ENCRYPT_MODE)
+	key, salt = derive_key(password, None)
 
 	print('\nLooking for files in the directory...')
 	ff = list_files(target_path, ENCRYPT_MODE) # List of files in the directory
@@ -79,15 +76,14 @@ def encrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	target_size = calc_total_size(ff)
 	if target_size == 0:
 		raise Exception(str(target_path) + ' is empty')
-	
-	print('\nEncrypting...\n')
-	progress = ProgressCLI(target_size)
-	key, salt = derive_key(password, None)
-
 	for f in ff:
 		f_out_name = replace_file_ext(f, 'kpk')
 		if os.path.exists(f_out_name): # Overwrite error
 			raise Exception(str(f_out_name) + ' already exists')
-		lib.encryptor.encrypt(key, salt, f, buffer_size, progress)
+
+	print('\nEncrypting...\n')
+	progress = ProgressCLI(target_size)
+	for f in ff:
+		lib.encryptor.encrypt(f, key, salt, buffer_size, progress)
 		if should_remove:
 			os.remove(f)
