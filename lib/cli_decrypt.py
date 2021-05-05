@@ -22,18 +22,17 @@ def execute(args: argparse.Namespace):
 
 def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	if file_ext(target_path) != 'kpk':
-			raise Exception('can not decrypt ' + str(target_path))
+		raise Exception('can not decrypt ' + str(target_path))
 
 	target_size = os.stat(target_path).st_size
 	if target_size == 0:
 		raise Exception(str(target_path) + ' is empty')
 
-	password = get_password(DECRYPT_MODE)		
+	password = get_password(DECRYPT_MODE)
 
 	print('\nDecrypting...\n')
 	progress = ProgressCLI(target_size - 48)
-
-	f_out_path, f_out_ext = lib.decryptor.decrypt(password, target_path, buffer_size, progress)
+	f_out_path, f_out_ext = lib.decryptor.decrypt(target_path, password, buffer_size, progress)
 	if f_out_ext == TEMP_ZIP_EXT:
 		unzip_dir(f_out_path)
 		os.remove(f_out_path)
@@ -54,8 +53,7 @@ def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 		raise Exception(str(target_path) + ' is empty')
 
 	progress = ProgressCLI(target_size - len(ff) * HEADER_SIZE)
-
 	for f in ff:
-		_, _ = lib.decryptor.decrypt(password, f, buffer_size, progress)
+		_, _ = lib.decryptor.decrypt(f, password, buffer_size, progress)
 		if should_remove:
 			os.remove(f)

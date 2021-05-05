@@ -6,12 +6,12 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
-from lib.passwd import derive_key
+from lib.key import derive_key
 from lib.progress import Progress
 from lib.file_extension import replace_file_ext
 from lib.constants import HEADER_SIZE
 
-def decrypt(password: str, f_in_path: Path, buffer_size: int, progress: Progress) -> (Path, str):
+def decrypt(f_in_path: Path, password: str, buffer_size: int, progress: Progress) -> (Path, str):
 	header = _read_header(f_in_path)
 	key, _ = derive_key(password, header['salt'])
 	decryptor = Cipher(
