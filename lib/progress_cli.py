@@ -1,4 +1,6 @@
 from math import floor
+import sys
+
 from lib.progress import Progress
 
 class ProgressCLI(Progress):
@@ -21,3 +23,4 @@ class ProgressCLI(Progress):
 	def print(self):
 		i = floor(self._percentage / 10)
 		print('\r' + 20*' ' + '\r' + self._bar[i] + ' ' + str(self._percentage) + '%', end='')
+		sys.stdout.flush()
