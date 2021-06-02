@@ -44,12 +44,19 @@ class TestDir_ListFiles(unittest.TestCase):
 			self.temp_dir_name / Path('temp_test_file_1.dat'),
 			self.temp_dir_name / Path('temp_test_file_3.txt')
 		]
-		self.assertListEqual(list_files(self.temp_dir_name, ENCRYPT_MODE), expected_file_list_enc)
+		ff_enc = list_files(self.temp_dir_name, ENCRYPT_MODE)
+		self.assertEqual(len(ff_enc), len(expected_file_list_enc))
+		for f in expected_file_list_enc:
+			self.assertTrue(f in ff_enc)
+
 		expected_file_list_dec = [
 			self.temp_dir_name / Path('temp_test_file_2.kpk'),
 			self.temp_dir_name / Path('temp_test_file_4.kpk')
 		]
-		self.assertListEqual(list_files(self.temp_dir_name, DECRYPT_MODE), expected_file_list_dec)
+		ff_dec = list_files(self.temp_dir_name, DECRYPT_MODE)
+		self.assertEqual(len(ff_dec), len(expected_file_list_dec))
+		for f in expected_file_list_dec:
+			self.assertTrue(f in ff_dec)
 
 	def tearDown(self):
 		shutil.rmtree(self.temp_dir_name)

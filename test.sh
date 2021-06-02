@@ -2,6 +2,10 @@
 
 python3 -m unittest discover -p "*_test.py" -v
 
+if [[ $? != 0 ]]; then
+	exit 1
+fi
+
 DATA='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et 
 dolore magna aliqua. Mus mauris vitae ultricies leo. Tempor nec feugiat nisl pretium fusce. Sollicitudin ac 
 orci phasellus egestas tellus rutrum tellus pellentesque. Imperdiet proin fermentum leo vel orci porta. 
