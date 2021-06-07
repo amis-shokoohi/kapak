@@ -5,7 +5,7 @@ import argparse
 from lib.file_extension import file_ext
 from lib.passwd import get_password
 from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, HEADER_SIZE
-from lib.progress_cli import ProgressCLI
+from lib.progress import Progress
 import lib.decryptor
 from lib.dir import unzip_dir, calc_total_size, list_files
 
@@ -31,7 +31,7 @@ def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	password = get_password(DECRYPT_MODE)
 
 	print('\nDecrypting...\n')
-	progress = ProgressCLI(target_size - 48)
+	progress = Progress(target_size - HEADER_SIZE)
 	f_out_path, f_out_ext = lib.decryptor.decrypt(target_path, password, buffer_size, progress)
 	if f_out_ext == TEMP_ZIP_EXT:
 		unzip_dir(f_out_path)
@@ -52,7 +52,7 @@ def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	if target_size == 0:
 		raise Exception(str(target_path) + ' is empty')
 
-	progress = ProgressCLI(target_size - len(ff) * HEADER_SIZE)
+	progress = Progress(target_size - len(ff) * HEADER_SIZE)
 	for f in ff:
 		_, _ = lib.decryptor.decrypt(f, password, buffer_size, progress)
 		if should_remove:

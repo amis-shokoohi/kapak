@@ -7,7 +7,7 @@ from lib.file_extension import file_ext, replace_file_ext
 from lib.passwd import get_password
 from lib.key import derive_key
 from lib.constants import ENCRYPT_MODE
-from lib.progress_cli import ProgressCLI
+from lib.progress import Progress
 import lib.encryptor
 from lib.dir import zip_dir, calc_total_size, list_files
 
@@ -37,7 +37,7 @@ def encrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	key, salt = derive_key(password, None)
 
 	print('\nEncrypting...\n')
-	progress = ProgressCLI(target_size)
+	progress = Progress(target_size)
 	lib.encryptor.encrypt(target_path, key, salt, buffer_size, progress)
 
 	if should_remove:
@@ -58,7 +58,7 @@ def zip_dir_then_encrypt(target_path: Path, should_remove: bool, buffer_size: in
 		raise Exception(str(target_path) + ' is empty')
 
 	print('\nEncrypting...\n')
-	progress = ProgressCLI(target_size)
+	progress = Progress(target_size)
 	lib.encryptor.encrypt(zp, key, salt, buffer_size, progress)
 
 	os.remove(zp)
@@ -82,7 +82,7 @@ def encrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 			raise Exception(str(f_out_name) + ' already exists')
 
 	print('\nEncrypting...\n')
-	progress = ProgressCLI(target_size)
+	progress = Progress(target_size)
 	for f in ff:
 		lib.encryptor.encrypt(f, key, salt, buffer_size, progress)
 		if should_remove:
