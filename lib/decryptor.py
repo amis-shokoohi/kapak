@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 from functools import partial
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -11,7 +11,7 @@ from lib.progress import Progress
 from lib.file_extension import replace_file_ext
 from lib.constants import HEADER_SIZE
 
-def decrypt(f_in_path: Path, password: str, buffer_size: int, progress: Progress) -> (Path, str):
+def decrypt(f_in_path: Path, password: str, buffer_size: int, progress: Progress) -> Tuple[Path, str]:
 	header = _read_header(f_in_path)
 	key, _ = derive_key(password, header['salt'])
 	decryptor = Cipher(

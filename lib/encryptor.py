@@ -1,7 +1,6 @@
 from os import urandom, path
 from pathlib import Path
 from functools import partial
-from typing import BinaryIO, Dict
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -12,8 +11,8 @@ from lib.progress import Progress
 
 def encrypt(f_in_path: Path, key: bytes, salt: bytes, buffer_size: int, progress: Progress):
 	ext = file_ext(f_in_path)
-	if len(ext) > 11:
-		raise Exception('unable to encrypt files with extension longer than 11B')
+	if len(ext) > 11: # 16B = 2B ext length + 11B ext + 0B padding + 3B b'kpk'
+		raise Exception('unable to encrypt files with extension longer than 11 characters')
 	
 	iv = urandom(16)
 	encryptor = Cipher(
@@ -22,16 +21,14 @@ def encrypt(f_in_path: Path, key: bytes, salt: bytes, buffer_size: int, progress
 		backend=default_backend()
 	).encryptor()
 
-	header = {
-		'iv': iv,
-		'salt': salt,
-		'cipher_ext': encryptor.update(_pad_ext(bytes(ext, 'utf-8')))
-	}
+	cipher_ext = encryptor.update(_pad_ext(bytes(ext, 'utf-8')))
 	f_out_path = replace_file_ext(f_in_path, 'kpk')
 	
 	with open(f_in_path, 'rb') as fd_in:
 		with open(f_out_path, 'wb') as fd_out:
-			_write_header(fd_out, header)
+			# Write header
+			fd_out.write(iv + salt + cipher_ext)
+
 			for chunk in iter(partial(fd_in.read, buffer_size), b''):
 				progress.update(len(chunk))
 				chunk = _pad_bytes(chunk)
@@ -49,15 +46,9 @@ def _pad_bytes(bytes_in: bytes) -> bytes:
 def _pad_ext(ext: bytes) -> bytes:
 	# Streches extension to 16B
 	ext_length = len(ext)
-	pad = urandom(11 - ext_length)
+	pad = bytes(''.zfill(11 - ext_length), 'utf-8')
 	ext_length_in_bytes = bytes(str(ext_length), 'utf-8')
 	if ext_length < 10:
 		ext_length_in_bytes = b'0' + ext_length_in_bytes
 	padded_ext = ext_length_in_bytes + ext + pad + b'kpk'
 	return padded_ext
-
-def _write_header(fd_out: BinaryIO, header: Dict[str, bytes]):
-	# Writes iv, salt & encrypted extension to first 48B of the output file
-	fd_out.write(header['iv'])
-	fd_out.write(header['salt'])
-	fd_out.write(header['cipher_ext'])
