@@ -1,23 +1,15 @@
 import os
 from pathlib import Path
 import zipfile
+from typing import List
 
 from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT
-from lib.file_extension import file_ext
 
-def calc_total_size(files: [Path]) -> int:
+def calc_total_size(files: List[Path]) -> int:
 	total_size = 0
 	for f in files:
 		total_size += os.stat(f).st_size
 	return total_size
-
-def list_files(dir_path: Path, mode: int) -> [Path]:
-	if mode == DECRYPT_MODE:
-		return list(dir_path.rglob('*.kpk'))
-	return list(filter(
-		lambda f: os.path.isfile(f) and os.stat(f).st_size != 0,
-		list(dir_path.rglob('*'))
-	))
 
 def zip_dir(dir_path: Path) -> Path:
 	splitted = os.path.split(dir_path)

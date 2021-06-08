@@ -3,13 +3,13 @@ import shutil
 from pathlib import Path
 import argparse
 
-from lib.file_extension import file_ext, replace_file_ext
+from lib.file_extension import replace_file_ext
 from lib.passwd import get_password
 from lib.key import derive_key
 from lib.constants import ENCRYPT_MODE
 from lib.progress import Progress
 import lib.encryptor
-from lib.dir import zip_dir, calc_total_size, list_files
+from lib.dir import zip_dir, calc_total_size
 
 def execute(args: argparse.Namespace):
 	args.buffer_size = args.buffer_size * 1024 * 1024 # ?MB
@@ -70,7 +70,10 @@ def encrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	key, salt = derive_key(password, None)
 
 	print('\nLooking for files in the directory...')
-	ff = list_files(target_path, ENCRYPT_MODE) # List of files in the directory
+	ff = list(filter(
+		lambda f: os.path.isfile(f) and os.stat(f).st_size != 0,
+		list(target_path.rglob('*'))
+	))
 	if len(ff) == 0:
 		raise Exception(str(target_path) + ' is empty')
 	target_size = calc_total_size(ff)

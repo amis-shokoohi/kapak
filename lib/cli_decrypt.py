@@ -7,7 +7,7 @@ from lib.passwd import get_password
 from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, HEADER_SIZE
 from lib.progress import Progress
 import lib.decryptor
-from lib.dir import unzip_dir, calc_total_size, list_files
+from lib.dir import unzip_dir, calc_total_size
 
 def execute(args: argparse.Namespace):
 	args.buffer_size = args.buffer_size * 1024 * 1024 # ?MB
@@ -44,7 +44,7 @@ def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	password = get_password(DECRYPT_MODE)
 
 	print('\nDecrypting...\n')
-	ff = list_files(target_path, DECRYPT_MODE) # List of files in the directory
+	ff = list(target_path.rglob('*.kpk'))
 	if len(ff) == 0:
 		raise Exception(str(target_path) + ' is empty')
 
