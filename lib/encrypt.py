@@ -1,7 +1,6 @@
 import os
 import shutil
 from pathlib import Path
-import argparse
 
 from lib.file_extension import replace_file_ext
 from lib.passwd import get_password
@@ -11,17 +10,17 @@ from lib.progress import Progress
 import lib.encryptor
 from lib.dir import zip_dir, calc_total_size
 
-def execute(args: argparse.Namespace):
-	args.buffer_size = args.buffer_size * 1024 * 1024 # ?MB
-	if not os.path.exists(args.path):
-		raise Exception('can not find ' + str(args.path))
+def execute(path: Path, buffer_size: int, should_remove: bool, should_zip: bool):
+	buffer_size = buffer_size * 1024 * 1024 # ?MB
+	if not os.path.exists(path):
+		raise Exception('can not find ' + str(path))
 
-	if os.path.isfile(args.path):
-		encrypt_file(args.path, args.should_remove, args.buffer_size)
-	elif args.should_zip and os.path.isdir(args.path):
-		zip_dir_then_encrypt(args.path, args.should_remove, args.buffer_size)
-	elif os.path.isdir(args.path):
-		encrypt_dir(args.path, args.should_remove, args.buffer_size)
+	if os.path.isfile(path):
+		encrypt_file(path, should_remove, buffer_size)
+	elif should_zip and os.path.isdir(path):
+		zip_dir_then_encrypt(path, should_remove, buffer_size)
+	elif os.path.isdir(path):
+		encrypt_dir(path, should_remove, buffer_size)
 	print() # Prints new line
 
 def encrypt_file(target_path: Path, should_remove: bool, buffer_size: int):

@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import argparse
 
 from lib.file_extension import file_ext
 from lib.passwd import get_password
@@ -9,15 +8,15 @@ from lib.progress import Progress
 import lib.decryptor
 from lib.dir import unzip_dir, calc_total_size
 
-def execute(args: argparse.Namespace):
-	args.buffer_size = args.buffer_size * 1024 * 1024 # ?MB
-	if not os.path.exists(args.path):
-		raise Exception('can not find ' + str(args.path))
+def execute(path: Path, buffer_size: int, should_remove: bool):
+	buffer_size = buffer_size * 1024 * 1024 # ?MB
+	if not os.path.exists(path):
+		raise Exception('can not find ' + str(path))
 
-	if os.path.isfile(args.path):
-		decrypt_file(args.path, args.should_remove, args.buffer_size)
-	elif os.path.isdir(args.path):
-		decrypt_dir(args.path, args.should_remove, args.buffer_size)
+	if os.path.isfile(path):
+		decrypt_file(path, should_remove, buffer_size)
+	elif os.path.isdir(path):
+		decrypt_dir(path, should_remove, buffer_size)
 	print() # Prints new line
 
 def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
