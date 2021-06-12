@@ -1,4 +1,4 @@
-from os import path, remove
+from pathlib import Path
 from getpass import getpass
 from sys import stderr
 
@@ -7,11 +7,11 @@ from lib.constants import DECRYPT_MODE
 def get_password(mode: int) -> str:
 	password = None
 	# Read the password from password.txt file
-	f = 'password.txt'
-	if path.exists(f):
+	f = Path('password.txt')
+	if f.exists():
 		with open(f, 'r') as passwd_file:
 			password = str(passwd_file.read())
-		remove(f)
+		f.unlink()
 	else: # Prompt user to enter the password
 		password = _ask_pass(mode)
 	

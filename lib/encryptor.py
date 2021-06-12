@@ -1,4 +1,4 @@
-from os import urandom, path
+from os import urandom
 from pathlib import Path
 from functools import partial
 
