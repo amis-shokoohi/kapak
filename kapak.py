@@ -29,7 +29,7 @@ def main():
 			path=args.path, 
 			buffer_size=args.buffer_size, 
 			should_remove=args.should_remove, 
-			should_zip=args.shouldzip
+			should_zip=args.should_zip
 		)
 	elif argv[1] == 'decrypt':
 		if len(argv) == 2 or argv[2] == '-h' or argv[2] == '--help':
