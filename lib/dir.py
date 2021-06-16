@@ -3,13 +3,19 @@ from pathlib import Path
 import zipfile
 from typing import List
 
-from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT
+from lib.constants import TEMP_ZIP_EXT
 
 def calc_total_size(files: List[Path]) -> int:
 	total_size = 0
 	for f in files:
-		total_size += os.stat(f).st_size
+		total_size += f.stat().st_size
 	return total_size
+
+def contains_encrypted_files(dir_path: Path) -> bool:
+	ff = list(dir_path.rglob('*.kpk'))
+	if len(ff) != 0:
+		return True
+	return False
 
 def zip_dir(dir_path: Path) -> Path:
 	splitted = os.path.split(dir_path)
@@ -18,6 +24,7 @@ def zip_dir(dir_path: Path) -> Path:
 
 	changed_dir = False
 	curr_dir = os.getcwd()
+	# check if dir_path is not relative to current path
 	if dir_path_head != '':
 		os.chdir(dir_path_head)
 		changed_dir = True

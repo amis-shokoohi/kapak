@@ -2,7 +2,7 @@ from pathlib import Path
 
 from lib.file_extension import file_ext
 from lib.passwd import get_password
-from lib.constants import DECRYPT_MODE, TEMP_ZIP_EXT, HEADER_SIZE
+from lib.constants import TEMP_ZIP_EXT
 from lib.progress import Progress
 import lib.decryptor
 from lib.dir import unzip_dir, calc_total_size
@@ -26,10 +26,10 @@ def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	if target_size == 0:
 		raise Exception(str(target_path) + ' is empty')
 
-	password = get_password(DECRYPT_MODE)
+	password = get_password(confirm=False)
 
 	print('\nDecrypting...\n')
-	progress = Progress(target_size - HEADER_SIZE)
+	progress = Progress(target_size)
 	f_out_path, f_out_ext = lib.decryptor.decrypt(target_path, password, buffer_size, progress)
 	if f_out_ext == TEMP_ZIP_EXT:
 		unzip_dir(f_out_path)
@@ -39,7 +39,7 @@ def decrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 		target_path.unlink()
 
 def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
-	password = get_password(DECRYPT_MODE)
+	password = get_password(confirm=False)
 
 	print('\nDecrypting...\n')
 	ff = list(target_path.rglob('*.kpk'))
@@ -50,7 +50,7 @@ def decrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
 	if target_size == 0:
 		raise Exception(str(target_path) + ' is empty')
 
-	progress = Progress(target_size - len(ff) * HEADER_SIZE)
+	progress = Progress(target_size)
 	for f in ff:
 		_, _ = lib.decryptor.decrypt(f, password, buffer_size, progress)
 		if should_remove:

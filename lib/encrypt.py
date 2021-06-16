@@ -4,7 +4,6 @@ from pathlib import Path
 from lib.file_extension import replace_file_ext
 from lib.passwd import get_password
 from lib.key import derive_key
-from lib.constants import ENCRYPT_MODE
 from lib.progress import Progress
 import lib.encryptor
 from lib.dir import zip_dir, calc_total_size, contains_encrypted_files
@@ -31,7 +30,7 @@ def encrypt_file(target_path: Path, should_remove: bool, buffer_size: int):
 	if f_out_name.exists(): # Overwrite error
 		raise Exception(str(f_out_name) + ' already exists')
 
-	password = get_password(ENCRYPT_MODE)
+	password = get_password(confirm=True)
 	key, salt = derive_key(password, None)
 
 	print('\nEncrypting...\n')
@@ -46,7 +45,7 @@ def zip_dir_then_encrypt(target_path: Path, should_remove: bool, buffer_size: in
 	if f_out_name.exists(): # Overwrite error
 		raise Exception(str(f_out_name) + ' already exists')
 
-	password = get_password(ENCRYPT_MODE)
+	password = get_password(confirm=True)
 	key, salt = derive_key(password, None)
 
 	print('\nLooking for files in the directory...')
@@ -68,7 +67,7 @@ def zip_dir_then_encrypt(target_path: Path, should_remove: bool, buffer_size: in
 		shutil.rmtree(target_path)
 
 def encrypt_dir(target_path: Path, should_remove: bool, buffer_size: int):
-	password = get_password(ENCRYPT_MODE)
+	password = get_password(confirm=True)
 	key, salt = derive_key(password, None)
 
 	print('\nLooking for files in the directory...')
