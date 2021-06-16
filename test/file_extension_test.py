@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from lib.file_extension import file_ext, replace_file_ext
+from lib.file_extension import *
 
 class TestFileExtension(unittest.TestCase):
 	def test_file_ext(self):
