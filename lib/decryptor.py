@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
 from functools import partial
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -9,10 +9,19 @@ from cryptography.hazmat.primitives import padding
 from lib.key import derive_key
 from lib.progress import Progress
 from lib.file_extension import replace_file_ext
-from lib.constants import HEADER_SIZE
+from lib.constants import VERSION
+
 
 def decrypt(f_in_path: Path, password: str, buffer_size: int, progress: Progress) -> Tuple[Path, str]:
 	header = _read_header(f_in_path)
+	header_length = header['header_length']
+	progress.update(header_length)
+
+	# Check version
+	major_version = int(VERSION.split('.')[0][1:])
+	if header['major_version'] != major_version:
+		raise Exception('need Kapak version ' + str(major_version) + ' to decrypt ' + str(f_in_path))
+
 	key, _ = derive_key(password, header['salt'])
 	decryptor = Cipher(
 		algorithms.AES(key), 
@@ -20,11 +29,17 @@ def decrypt(f_in_path: Path, password: str, buffer_size: int, progress: Progress
 		backend=default_backend()
 	).decryptor()
 
-	f_out_ext = _unpad_ext(decryptor.update(header['cipher_ext']))
+	# Decrypt file extension
+	try:
+		f_out_ext = str(_unpad_bytes(decryptor.update(header['cipher_ext'])), 'utf-8')
+		if len(f_out_ext) != header['ext_length']:
+			raise Exception('wrong password')
+	except UnicodeDecodeError:
+			raise Exception('wrong password')
+
 	f_out_path = replace_file_ext(f_in_path, f_out_ext)
-	
 	with open(f_in_path, 'rb') as fd_in:
-		fd_in.seek(48) # Skip the header
+		fd_in.seek(header_length) # Skip the header
 		with open(f_out_path, 'wb') as fd_out:
 			for chunk in iter(partial(fd_in.read, buffer_size), b''):
 				progress.update(len(chunk))
@@ -33,8 +48,9 @@ def decrypt(f_in_path: Path, password: str, buffer_size: int, progress: Progress
 				fd_out.write(chunk)
 				progress.print()
 			fd_out.write(decryptor.finalize())
-	
+
 	return f_out_path, f_out_ext
+
 
 def _unpad_bytes(bytes_in: bytes) -> bytes:
 	unpadder = padding.PKCS7(128).unpadder()
@@ -43,25 +59,21 @@ def _unpad_bytes(bytes_in: bytes) -> bytes:
 	except ValueError:
 		return bytes_in
 
-def _unpad_ext(ext: bytes) -> str:
-	# 16B: length(2B) + ext(?) + pad(?) + b'kpk'(3B). e.g. 03txtppppppppkpk
-	if ext[13:16] != b'kpk':
-		raise Exception('invalid password')
 
-	ext_length = None
-	try:
-		ext_length = int(ext[:2])
-	except ValueError:
-		raise Exception('invalid password')
-
-	return str(ext[2:2 + ext_length], 'utf-8')
-
-def _read_header(f_in_path: Path) -> Dict[str, bytes]:
+def _read_header(f_in_path: Path) -> Dict[str, Union[bytes, int]]:
 	header = b''
-	with open(f_in_path, 'rb') as fd_in:
-		header = fd_in.read(HEADER_SIZE)
+	header_length = 0
+	with open(f_in_path, 'rb') as f:
+		try:
+			header_length = int(f.read(4))
+		except ValueError:
+			raise Exception('need older versions of Kapak to decrypt ' + str(f_in_path))
+		header = f.read(header_length)
 	return {
-		'iv': header[0:16],
-		'salt': header[16:32],
-		'cipher_ext': header[32:64]
+		'header_length': 4 + header_length,
+		'major_version': int(header[0:4]),
+		'iv': header[4:20],
+		'salt': header[20:36],
+		'ext_length': int(header[36:40]),
+		'cipher_ext': header[40:]
 	}

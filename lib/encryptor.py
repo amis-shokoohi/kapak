@@ -8,11 +8,14 @@ from cryptography.hazmat.primitives import padding
 
 from lib.file_extension import file_ext, replace_file_ext
 from lib.progress import Progress
+from lib.constants import VERSION
+
 
 def encrypt(f_in_path: Path, key: bytes, salt: bytes, buffer_size: int, progress: Progress):
+	major_version = bytes(VERSION.split('.')[0][1:].zfill(4), 'utf-8') # 4B
+
 	ext = file_ext(f_in_path)
-	if len(ext) > 11: # 16B = 2B ext length + 11B ext + 0B padding + 3B b'kpk'
-		raise Exception('unable to encrypt files with extension longer than 11 characters')
+	ext_length = bytes(str(len(ext)).zfill(4), 'utf-8')
 	
 	iv = urandom(16)
 	encryptor = Cipher(
@@ -21,13 +24,16 @@ def encrypt(f_in_path: Path, key: bytes, salt: bytes, buffer_size: int, progress
 		backend=default_backend()
 	).encryptor()
 
-	cipher_ext = encryptor.update(_pad_ext(bytes(ext, 'utf-8')))
-	f_out_path = replace_file_ext(f_in_path, 'kpk')
+	cipher_ext = encryptor.update(_pad_bytes(bytes(ext, 'utf-8')))
+
+	header = major_version + iv + salt + ext_length + cipher_ext
+	header_length = bytes(str(len(header)).zfill(4), 'utf-8') # 4B
 	
+	f_out_path = replace_file_ext(f_in_path, 'kpk')
 	with open(f_in_path, 'rb') as fd_in:
 		with open(f_out_path, 'wb') as fd_out:
 			# Write header
-			fd_out.write(iv + salt + cipher_ext)
+			fd_out.write(header_length + header)
 
 			for chunk in iter(partial(fd_in.read, buffer_size), b''):
 				progress.update(len(chunk))
@@ -37,18 +43,9 @@ def encrypt(f_in_path: Path, key: bytes, salt: bytes, buffer_size: int, progress
 				progress.print()
 			fd_out.write(encryptor.finalize())
 
+
 def _pad_bytes(bytes_in: bytes) -> bytes:
 	if len(bytes_in) % 16 == 0:
 		return bytes_in
 	padder = padding.PKCS7(128).padder()
 	return padder.update(bytes_in) + padder.finalize()
-
-def _pad_ext(ext: bytes) -> bytes:
-	# Streches extension to 16B
-	ext_length = len(ext)
-	pad = bytes(''.zfill(11 - ext_length), 'utf-8')
-	ext_length_in_bytes = bytes(str(ext_length), 'utf-8')
-	if ext_length < 10:
-		ext_length_in_bytes = b'0' + ext_length_in_bytes
-	padded_ext = ext_length_in_bytes + ext + pad + b'kpk'
-	return padded_ext
