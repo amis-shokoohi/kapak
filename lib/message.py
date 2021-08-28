@@ -1,7 +1,6 @@
-from lib.constants import VERSION
+from lib.constants import VERSION, BUFFER_SIZE
 
 def print_description():
-	print(LOGO)
 	print(DESCRIPTION)
 
 def print_version():
@@ -17,44 +16,45 @@ def print_help_encrypt():
 def print_help_decrypt():
 	print(USAGE_DECRYPT)
 
-LOGO = '\n\
-    ▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ \n\
-    █▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪\n\
-    ▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·\n\
-    ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    {version}\n\
-    ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀\n\
-'.format(version=VERSION)
+DESCRIPTION = '''
+    ▄ •▄  ▄▄▄·  ▄▄▄· ▄▄▄· ▄ •▄ 
+    █▌▄▌▪▐█ ▀█ ▐█ ▄█▐█ ▀█ █▌▄▌▪
+    ▐▀▀▄·▄█▀▀█  ██▀·▄█▀▀█ ▐▀▀▄·
+    ▐█.█▌▐█ ▪▐▌▐█▪·•▐█ ▪▐▌▐█.█▌    {version}
+    ·▀  ▀ ▀  ▀ .▀    ▀  ▀ ·▀  ▀
 
-DESCRIPTION = '\
-Description: A simple-to-use file encryption script which\n\
-             uses AES symmetric encryption methods\n\
-Link:        https://github.com/amis-shokoohi/kapak\n\n\
-Help:        kapak [ -h | --help ]\n\
-'
+Description: A simple-to-use file encryption script
+Link:        https://github.com/amis-shokoohi/kapak
+Help:        kapak [ -h | --help ]
+'''.format(version=VERSION)
 
-USAGE = '\n\
-Usage: kapak [GLOBAL OPTIONS] COMMAND [COMMAND OPTIONS] PATH\n\n\
-Global Options:\n\
-  -h, --help     Prints help message\n\
-  -v, --version  Prints version\n\n\
-Commands:\n\
-  encrypt  Encrypts the specified file/directory\n\
-  decrypt  Decrypts the specified file/directory\n\
-'
+USAGE = '''
+usage: kapak [global options] <command> [command options] <path>
 
-USAGE_ENCRYPT = '\n\
-Usage: kapak encrypt [OPTIONS] PATH\n\n\
-Options:\n\
-  -h, --help         Prints help message\n\
-  -r, --remove       Removes the target file/directory\n\
-  -z, --zip          Zips the directory before encryption\n\
-  -b, --buffer-size  Buffer size in megabytes (default: 64)\n\
-'
+global options:
+  -h, --help     Prints help message
+  -v, --version  Prints version
 
-USAGE_DECRYPT = '\n\
-Usage: kapak decrypt [OPTIONS] PATH\n\n\
-Options:\n\
-  -h, --help         Prints help message\n\
-  -r, --remove       Removes the target file/directory\n\
-  -b, --buffer-size  Buffer size in megabytes (default: 64)\n\
-'
+commands:
+  e, encrypt  Encrypts the specified file/directory
+  d, decrypt  Decrypts the specified file/directory
+'''
+
+USAGE_ENCRYPT = '''
+usage: kapak [encrypt | e] [options] <path>
+
+options:
+  -h, --help         Prints help message
+  -r, --remove       Removes the target file/directory
+  -z, --zip          Zips the directory before encryption
+  -b, --buffer-size  Buffer size in megabytes (default: {buffer_size})
+'''.format(buffer_size=BUFFER_SIZE)
+
+USAGE_DECRYPT = '''
+usage: kapak [decrypt | d] [options] <path>
+
+options:
+  -h, --help         Prints help message
+  -r, --remove       Removes the target file/directory
+  -b, --buffer-size  Buffer size in megabytes (default: {buffer_size})
+'''.format(buffer_size=BUFFER_SIZE)
