@@ -1,3 +1,0 @@
-BUFFER_SIZE = 64 # 64MB
-TEMP_ZIP_EXT = 'kpktempzip'
-VERSION='v3.1.0'
