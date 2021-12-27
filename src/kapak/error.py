@@ -1,0 +1,2 @@
+class KapakError(Exception):
+    pass
