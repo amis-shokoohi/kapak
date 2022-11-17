@@ -31,16 +31,16 @@ class Encryptor:
         else:
             self._progress = ProgressDefault()
 
-    def encrypt(self, src: Path, password: str, remove_: bool = False) -> Path:
+    def encrypt(self, src: Path, password: str) -> Path:
         if not src.exists():
             raise KapakError(f"can not find {src}")
 
         if src.is_file():
-            return self._encrypt_file(src, password, remove_)
+            return self._encrypt_file(src, password)
 
         raise KapakError(f"{src} is not a file")
 
-    def _encrypt_file(self, src: Path, password: str, remove_: bool) -> Path:
+    def _encrypt_file(self, src: Path, password: str) -> Path:
         src_size = src.stat().st_size
         if src_size == 0:
             raise KapakError(f"{src} is empty")
@@ -56,7 +56,5 @@ class Encryptor:
         self._progress.set_total(src_size)
         for p in kapak.aes.encrypt(src, dest, key, salt, self._buffer_size):
             self._progress.update(p)
-        if remove_:
-            src.unlink()
 
         return dest

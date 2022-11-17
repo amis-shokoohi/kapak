@@ -29,16 +29,16 @@ class Decryptor:
         else:
             self._progress = ProgressDefault()
 
-    def decrypt(self, src: Path, password: str, remove_: bool = False) -> None:
+    def decrypt(self, src: Path, password: str) -> None:
         if not src.exists():
             raise KapakError(f"can not find {src}")
 
         if src.is_file():
-            return self._decrypt_file(src, password, remove_)
+            return self._decrypt_file(src, password)
 
         raise KapakError(f"{src} is not a file")
 
-    def _decrypt_file(self, src: Path, password: str, remove_: bool) -> None:
+    def _decrypt_file(self, src: Path, password: str) -> None:
         if not src.match("*.kpk"):
             raise KapakError(f"can not decrypt {src}")
 
@@ -50,6 +50,3 @@ class Decryptor:
         self._progress.set_total(src_size)
         for p in kapak.aes.decrypt(src, password, self._buffer_size):
             self._progress.update(p)
-
-        if remove_:
-            src.unlink()

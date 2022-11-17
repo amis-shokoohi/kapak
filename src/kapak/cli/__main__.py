@@ -25,7 +25,6 @@ def cli(argv: List[str]) -> None:
             kapak.cli.message.print_help_encrypt()
             return
         parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument("-r", "--remove", action="store_true", dest="remove")
         parser.add_argument(
             "-b",
             "--buffer-size",
@@ -50,14 +49,13 @@ def cli(argv: List[str]) -> None:
         progress = Progress(logger)
 
         e = Encryptor(buffer_size=args.buffer_size, logger=logger, progress=progress)
-        e.encrypt(src=args.path, password=password, remove_=args.remove)
+        e.encrypt(src=args.path, password=password)
         print()  # Print a newline
     elif argv[1] == "d" or argv[1] == "decrypt":
         if len(argv) == 2 or argv[2] == "-h" or argv[2] == "--help":
             kapak.cli.message.print_help_decrypt()
             return
         parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument("-r", "--remove", action="store_true", dest="remove")
         parser.add_argument(
             "-b",
             "--buffer-size",
@@ -82,7 +80,7 @@ def cli(argv: List[str]) -> None:
         progress = Progress(logger)
 
         d = Decryptor(buffer_size=args.buffer_size, logger=logger, progress=progress)
-        d.decrypt(src=args.path, password=password, remove_=args.remove)
+        d.decrypt(src=args.path, password=password)
         print()  # Print a newline
     else:
         kapak.cli.message.print_help()
