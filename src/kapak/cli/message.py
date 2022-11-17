@@ -52,7 +52,6 @@ usage: kapak [encrypt | e] [options] <path>
 options:
   -h, --help           Print the help message
   -r, --remove         Remove the file/directory after encryption
-  -z, --zip            Zip the directory before encryption
   -b, --buffer-size    Buffer size in megabytes (default: {BUFFER_SIZE})
   -p, --password-file  Password file path (format: .txt)
 """

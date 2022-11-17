@@ -1,10 +1,9 @@
 from pathlib import Path
 from typing import List, Optional
 
-from kapak.constant import BUFFER_SIZE, TEMP_ZIP_EXT
+from kapak.constant import BUFFER_SIZE
 from kapak.logger import LoggerType, LoggerDefault
 from kapak.progress import ProgressType, ProgressDefault
-from kapak.zip import unzip_dir
 from kapak.error import KapakError
 import kapak.aes
 
@@ -30,7 +29,7 @@ class Decryptor:
         else:
             self._progress = ProgressDefault()
 
-    def decrypt(self, src: Path, password: str, remove_: bool = False) -> Path:
+    def decrypt(self, src: Path, password: str, remove_: bool = False) -> None:
         if not src.exists():
             raise KapakError(f"can not find {src}")
 
@@ -41,7 +40,7 @@ class Decryptor:
         else:
             raise KapakError(f"{src} is neither a file nor a directory")
 
-    def _decrypt_file(self, src: Path, password: str, remove_: bool) -> Path:
+    def _decrypt_file(self, src: Path, password: str, remove_: bool) -> None:
         if not src.match("*.kpk"):
             raise KapakError(f"can not decrypt {src}")
 
@@ -54,16 +53,10 @@ class Decryptor:
         for p in kapak.aes.decrypt(src, password, self._buffer_size):
             self._progress.update(p)
 
-        dest_z = src.with_suffix("." + TEMP_ZIP_EXT)
-        if dest_z.exists():
-            dest = unzip_dir(dest_z)
-            dest_z.unlink()
         if remove_:
             src.unlink()
 
-        return dest
-
-    def _decrypt_dir(self, src: Path, password: str, remove_: bool) -> Path:
+    def _decrypt_dir(self, src: Path, password: str, remove_: bool) -> None:
         self._logger.info("Scanning the directory...")
         ff: List[Path] = []
         src_size = 0
@@ -80,5 +73,3 @@ class Decryptor:
                 self._progress.update(p)
             if remove_:
                 f.unlink()
-
-        return src
