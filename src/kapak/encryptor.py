@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from kapak.constant import BUFFER_SIZE
 from kapak.logger import LoggerType, LoggerDefault
@@ -37,10 +37,8 @@ class Encryptor:
 
         if src.is_file():
             return self._encrypt_file(src, password, remove_)
-        elif src.is_dir():
-            return self._encrypt_dir(src, password, remove_)
-        else:
-            raise KapakError(f"{src} is neither a file nor a directory")
+
+        raise KapakError(f"{src} is not a file")
 
     def _encrypt_file(self, src: Path, password: str, remove_: bool) -> Path:
         src_size = src.stat().st_size
@@ -62,32 +60,3 @@ class Encryptor:
             src.unlink()
 
         return dest
-
-    def _encrypt_dir(self, src: Path, password: str, remove_: bool) -> Path:
-        salt = os.urandom(16)
-        key = derive_key(password, salt)
-
-        self._logger.info("Scanning the directory...")
-        ff: List[Path] = []
-        src_size = 0
-        for f in src.rglob("*"):
-            if f.match("*.kpk"):
-                raise KapakError(f"{src} contains encrypted files")
-            f_size = f.stat().st_size
-            if f.is_file() and f_size != 0:
-                ff.append(f)
-                src_size += f_size
-        if len(ff) == 0 or src_size == 0:
-            raise KapakError(f"{src} is empty")
-
-        self._logger.info("Encrypting...")
-        self._progress.set_total(src_size)
-        for f in ff:
-            for p in kapak.aes.encrypt(
-                f, f.with_suffix(".kpk"), key, salt, self._buffer_size
-            ):
-                self._progress.update(p)
-            if remove_:
-                f.unlink()
-
-        return src

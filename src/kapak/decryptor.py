@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from kapak.constant import BUFFER_SIZE
 from kapak.logger import LoggerType, LoggerDefault
@@ -35,10 +35,8 @@ class Decryptor:
 
         if src.is_file():
             return self._decrypt_file(src, password, remove_)
-        elif src.is_dir():
-            return self._decrypt_dir(src, password, remove_)
-        else:
-            raise KapakError(f"{src} is neither a file nor a directory")
+
+        raise KapakError(f"{src} is not a file")
 
     def _decrypt_file(self, src: Path, password: str, remove_: bool) -> None:
         if not src.match("*.kpk"):
@@ -55,21 +53,3 @@ class Decryptor:
 
         if remove_:
             src.unlink()
-
-    def _decrypt_dir(self, src: Path, password: str, remove_: bool) -> None:
-        self._logger.info("Scanning the directory...")
-        ff: List[Path] = []
-        src_size = 0
-        for f in src.rglob("*.kpk"):
-            ff.append(f)
-            src_size += f.stat().st_size
-        if len(ff) == 0 or src_size == 0:
-            raise KapakError(f"{src} is empty")
-
-        self._logger.info("Decrypting...")
-        self._progress.set_total(src_size)
-        for f in ff:
-            for p in kapak.aes.decrypt(f, password, self._buffer_size):
-                self._progress.update(p)
-            if remove_:
-                f.unlink()
