@@ -5,7 +5,7 @@ import itertools
 from kapak.cli.progress import Progress
 
 
-def test_progress_update():
+def test_progress_update() -> None:
     total = 12
     progress = Progress(total)
 
@@ -21,7 +21,7 @@ def test_progress_update():
             assert captured.getvalue().find(f"{percentage}%") != -1
 
 
-def test_progress_total_zero():
+def test_progress_total_zero() -> None:
     total = 0
     progress = Progress(total)
 

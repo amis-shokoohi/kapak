@@ -3,7 +3,7 @@ from pathlib import Path
 from kapak.cli.pipe import Pipe
 
 
-def test_pipe_filein_fileout(tmp_path: Path):
+def test_pipe_filein_fileout(tmp_path: Path) -> None:
     temp_filein = Path(tmp_path, "temp_filein")
     temp_fileout = Path(tmp_path, "temp_fileout")
 

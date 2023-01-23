@@ -4,7 +4,7 @@ import contextlib
 import kapak.cli.cmd
 
 
-def test_run_print():
+def test_run_print() -> None:
     cases = [
         (
             ["cmd"],
