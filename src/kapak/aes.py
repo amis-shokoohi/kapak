@@ -1,8 +1,7 @@
 from os import urandom
-from pathlib import Path
 from functools import partial
 from hashlib import sha256
-from typing import Generator
+from typing import Generator, BinaryIO
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -13,48 +12,126 @@ from kapak.key import derive_key
 from kapak.error import KapakError
 
 
+BUFFER_SIZE = 64 * 1024
 AES_BLOCK_SIZE = 16
+SALT_SIZE = 16
+VERIFIER_SIZE = 16
+VERIFIER_HASH_SIZE = 32
 
 
 def encrypt(
-    src: Path, dest: Path, key: bytes, salt: bytes, buffer_size: int
+    src: BinaryIO, dst: BinaryIO, password: str, buffer_size: int = BUFFER_SIZE
 ) -> Generator[int, None, None]:
+    if buffer_size % AES_BLOCK_SIZE != 0:
+        raise KapakError("buffer size must be a multiple of aes-block-size (16 bytes)")
+
+    salt = urandom(SALT_SIZE)
+    key = derive_key(password, salt)
+
     iv = urandom(AES_BLOCK_SIZE)
     encryptor = Cipher(
         algorithms.AES(key), modes.CBC(iv), backend=default_backend()
     ).encryptor()
 
-    verifier = urandom(16)
-    verifier_hash = sha256(verifier)
-    encrypted_verifier = encryptor.update(verifier)
-    encrypted_verifier_hash = encryptor.update(verifier_hash.digest())
-
-    ext = src.suffix
-    encrypted_ext = encryptor.update(_pad_bytes(bytes(ext, "utf-8")))
-
     major_version = int(__version__.split(".")[0]).to_bytes(4, "big")
 
+    salt_size = SALT_SIZE.to_bytes(4, "big")
+
+    # This is just a quick way to inform user that the entered password is wrong in decryption phase.
+    # This does not check authenticity or integrity of the encrypted file by any means.
+    verifier = urandom(VERIFIER_SIZE)
+    verifier_hash = sha256(verifier)
+    encrypted_verifier = encryptor.update(verifier)
+    verifier_size = VERIFIER_SIZE.to_bytes(4, "big")
+    encrypted_verifier_hash = encryptor.update(verifier_hash.digest())
+    verifier_hash_size = VERIFIER_HASH_SIZE.to_bytes(4, "big")
+
+    reserved_size = int(0).to_bytes(4, "big")
+
     header = (
-        major_version
+        b"kapak"
+        + major_version
         + iv
+        + salt_size
         + salt
+        + verifier_size
         + encrypted_verifier
+        + verifier_hash_size
         + encrypted_verifier_hash
-        + encrypted_ext
+        + reserved_size
+        + reserved_size
     )
     header_length = len(header).to_bytes(4, "big")
+    header = header_length + header
 
-    with src.open("rb") as src_, dest.open("wb") as dest_:
-        # Write header
-        dest_.write(header_length + header)
+    dst.write(header)
 
-        for chunk in iter(partial(src_.read, buffer_size), b""):
-            chunk_len = len(chunk)
-            chunk = _pad_bytes(chunk)
-            chunk = encryptor.update(chunk)
-            dest_.write(chunk)
-            yield chunk_len
-        dest_.write(encryptor.finalize())
+    for chunk in iter(partial(src.read, buffer_size), b""):
+        chunk_len = len(chunk)
+        chunk = _pad_bytes(chunk)
+        chunk = encryptor.update(chunk)
+        dst.write(chunk)
+        yield chunk_len
+    dst.write(encryptor.finalize())
+
+
+class Header:
+    def __init__(self, header: bytes) -> None:
+        self.header = header
+        self._cursor = 0
+
+    def read(self, length: int) -> bytes:
+        current_position = self._cursor
+        self._cursor += length
+        return self.header[current_position : self._cursor]
+
+
+def decrypt(
+    src: BinaryIO, dst: BinaryIO, password: str, buffer_size: int = BUFFER_SIZE
+) -> Generator[int, None, None]:
+    if buffer_size % AES_BLOCK_SIZE != 0:
+        raise KapakError("buffer size must be a multiple of aes-block-size (16 bytes)")
+
+    header_length = int.from_bytes(src.read(4), "big")
+    header = Header(src.read(header_length))
+    yield 4 + header_length
+
+    if header.read(5) != b"kapak":
+        raise KapakError("not able to decrypt this file format")
+
+    # Check version
+    src_mv = int.from_bytes(header.read(4), "big")
+    mv = int(__version__.split(".")[0])
+    if src_mv != mv:
+        raise KapakError("source version does not match the current version of Kapak")
+
+    iv = header.read(AES_BLOCK_SIZE)
+    salt_size = int.from_bytes(header.read(4), "big")
+    salt = header.read(salt_size)
+    key = derive_key(password, salt)
+    decryptor = Cipher(
+        algorithms.AES(key), modes.CBC(iv), backend=default_backend()
+    ).decryptor()
+
+    # Check key
+    # This is just a quick way to inform user that the entered password is wrong.
+    # This does not check authenticity or integrity of the encrypted file by any means.
+    verifier_size = int.from_bytes(header.read(4), "big")
+    encrypted_verifier = header.read(verifier_size)
+    verifier = decryptor.update(encrypted_verifier)
+    verifier_hash_size = int.from_bytes(header.read(4), "big")
+    encrypted_verifier_hash = header.read(verifier_hash_size)
+    verifier_hash = decryptor.update(encrypted_verifier_hash)
+    if sha256(verifier).digest() != verifier_hash:
+        raise KapakError("wrong password")
+
+    for chunk in iter(partial(src.read, buffer_size), b""):
+        chunk_len = len(chunk)
+        chunk = decryptor.update(chunk)
+        chunk = _unpad_bytes(chunk)
+        dst.write(chunk)
+        yield chunk_len
+    dst.write(decryptor.finalize())
 
 
 def _pad_bytes(bytes_in: bytes) -> bytes:
@@ -63,49 +140,6 @@ def _pad_bytes(bytes_in: bytes) -> bytes:
     padder = padding.PKCS7(AES_BLOCK_SIZE * 8).padder()
     padded: bytes = padder.update(bytes_in) + padder.finalize()
     return padded
-
-
-def decrypt(src: Path, password: str, buffer_size: int) -> Generator[int, None, None]:
-    with src.open("rb") as src_:
-        header_length = int.from_bytes(src_.read(4), "big")
-        header = src_.read(header_length)
-        yield 4 + header_length
-
-        # Check version
-        src_mv = int.from_bytes(header[0:4], "big")
-        mv = int(__version__.split(".")[0])
-        if src_mv != mv:
-            raise KapakError(f"need an older version of Kapak to decrypt {src}")
-
-        iv = header[4 : 4 + AES_BLOCK_SIZE]
-        salt = header[4 + AES_BLOCK_SIZE : 20 + AES_BLOCK_SIZE]
-        key = derive_key(password, salt)
-        decryptor = Cipher(
-            algorithms.AES(key), modes.CBC(iv), backend=default_backend()
-        ).decryptor()
-
-        # Verify key
-        encrypted_verifier = header[20 + AES_BLOCK_SIZE : 36 + AES_BLOCK_SIZE]
-        verifier = decryptor.update(encrypted_verifier)
-        encrypted_verifier_hash = header[36 + AES_BLOCK_SIZE : 68 + AES_BLOCK_SIZE]
-        verifier_hash = decryptor.update(encrypted_verifier_hash)
-        if sha256(verifier).digest() != verifier_hash:
-            raise KapakError("wrong password")
-
-        # Decrypt file extension
-        encrypted_ext = header[68 + AES_BLOCK_SIZE :]
-        dest_ext = str(_unpad_bytes(decryptor.update(encrypted_ext)), "utf-8")
-        dest_ext = dest_ext if dest_ext == "" else "." + dest_ext
-
-        dest = src.with_suffix(dest_ext)
-        with open(dest, "wb") as dest_:
-            for chunk in iter(partial(src_.read, buffer_size), b""):
-                chunk_len = len(chunk)
-                chunk = decryptor.update(chunk)
-                chunk = _unpad_bytes(chunk)
-                dest_.write(chunk)
-                yield chunk_len
-            dest_.write(decryptor.finalize())
 
 
 def _unpad_bytes(bytes_in: bytes) -> bytes:
