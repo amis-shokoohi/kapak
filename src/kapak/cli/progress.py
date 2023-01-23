@@ -1,6 +1,5 @@
 import sys
 from math import floor
-from time import sleep
 
 
 class Progress:

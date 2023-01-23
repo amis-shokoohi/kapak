@@ -1,7 +1,6 @@
 import io
 import contextlib
 import itertools
-from math import ceil
 
 from kapak.cli.progress import Progress
 
@@ -18,7 +17,7 @@ def test_progress_update():
             progress.update(i)
             assert progress.progress == expect
 
-            percentage = ceil(expect / total * 100)
+            percentage = int(expect / total * 100)
             assert captured.getvalue().find(f"{percentage}%") != -1
 
 
