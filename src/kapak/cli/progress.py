@@ -1,35 +1,39 @@
-from math import ceil, floor
-
-from kapak.logger import LoggerType
+import sys
+from math import floor
+from time import sleep
 
 
 class Progress:
+    _space = 20 * " "
     _bar = [
-        "[□□□□□□□□□□]",
-        "[■□□□□□□□□□]",
-        "[■■□□□□□□□□]",
-        "[■■■□□□□□□□]",
-        "[■■■■□□□□□□]",
-        "[■■■■■□□□□□]",
-        "[■■■■■■□□□□]",
-        "[■■■■■■■□□□]",
-        "[■■■■■■■■□□]",
-        "[■■■■■■■■■□]",
-        "[■■■■■■■■■■]",
+        "□□□□□□□□□□",
+        "■□□□□□□□□□",
+        "■■□□□□□□□□",
+        "■■■□□□□□□□",
+        "■■■■□□□□□□",
+        "■■■■■□□□□□",
+        "■■■■■■□□□□",
+        "■■■■■■■□□□",
+        "■■■■■■■■□□",
+        "■■■■■■■■■□",
+        "■■■■■■■■■■",
     ]
 
-    def __init__(self, logger: LoggerType) -> None:
-        self._logger = logger
+    def __init__(self, total: int) -> None:
+        self._total = total
         self._progress = 0
 
-    def set_total(self, total: int) -> None:
-        self._total = total
-        self._progress = 0  # Reset
+    @property
+    def progress(self) -> int:
+        return self._progress
 
-    def update(self, part: int) -> None:
-        self._progress += part
-        percentage = ceil(self._progress / self._total * 100)
-        percentage = percentage if percentage <= 100 else 100
+    def update(self, chunk_len: int) -> None:
+        if self._total == 0:
+            return
+        self._progress += chunk_len
+        percentage = int(self._progress / self._total * 100)
         i = floor(percentage / 10)
-        space = 20 * " "
-        self._logger.info(f"\r{space}\r{self._bar[i]} {percentage}%", end="")
+        sys.stderr.write(f"\r{self._space}\r{self._bar[i]} {percentage}%")
+        if i == 10:
+            sys.stderr.write("\n")
+        sys.stderr.flush()
