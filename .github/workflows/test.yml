@@ -2,9 +2,9 @@ name: Test
 
 on:
   push:
+  pull_request:
     branches:
       - main
-      - dev
 
 jobs:
   test:
@@ -31,4 +31,22 @@ jobs:
       - name: Type check
         run: poetry run mypy
       - name: Test
-        run: poetry run pytest --cov=kapak
+        run: poetry run pytest
+
+  codecov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+      - name: Install dependencies
+        run: poetry install
+      - name: Test
+        run: poetry run pytest --cov=kapak --cov-report=xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
