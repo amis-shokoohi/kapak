@@ -1,0 +1,34 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Install Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "poetry"
+      - name: Install dependencies
+        run: poetry install
+      - name: Code quality
+        run: poetry run black . --check
+      - name: Lint
+        run: poetry run flake8 src tests
+      - name: Type check
+        run: poetry run mypy
+      - name: Test
+        run: poetry run pytest --cov=kapak
