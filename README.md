@@ -2,6 +2,14 @@
   <img src="https://user-images.githubusercontent.com/24605263/214285260-80aed843-17e6-4a2f-98bf-bfb21f900dff.png">
 </p>
 
+[![tests](https://github.com/amis-shokoohi/kapak/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/amis-shokoohi/kapak/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/amis-shokoohi/kapak/branch/main/graph/badge.svg?token=6W2V3QOZKP)](https://codecov.io/gh/amis-shokoohi/kapak)
+![GitHub](https://img.shields.io/github/license/amis-shokoohi/kapak)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/amis-shokoohi/kapak/main)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/amis-shokoohi/kapak)
+![GitHub Repo stars](https://img.shields.io/github/stars/amis-shokoohi/kapak)
+![GitHub forks](https://img.shields.io/github/forks/amis-shokoohi/kapak)
+
 # kapak: A simple-to-use file encryption script
 
 - [Description](#description)
