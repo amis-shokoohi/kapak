@@ -1,11 +1,13 @@
-name: Publish to TestPyPI
+name: Publish to PyPI
 
-on: workflow_dispatch
+on:
+  release:
+    types: [published]
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    environment: test.pypi
+    environment: pypi
     steps:
       - uses: actions/checkout@v3
       - name: Install poetry
@@ -17,8 +19,8 @@ jobs:
           cache: "poetry"
       - name: Build distribution
         run: poetry build
-      - name: Publish distribution to TestPyPI
+      - name: Publish distribution to PyPI
+        if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+          password: ${{ secrets.PYPI_API_TOKEN }}
