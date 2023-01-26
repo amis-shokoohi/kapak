@@ -1,4 +1,4 @@
-import base64
+import random
 from io import BytesIO
 from dataclasses import dataclass
 
@@ -12,52 +12,16 @@ from kapak.version import __version__
 @dataclass(frozen=True)
 class Data:
     input: bytes
-    expect: bytes
     password: str
     buffer_size: int
 
 
-data_to_encrypt = [
-    Data(
-        input=b"yFwMtWN+oqXlKi",  # 14 bytes
-        expect=b"oUHllfAnIZoNLAKy88LHpA==",
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"ElOTSoqLIEg7KygP",  # 16 bytes
-        expect=b"3hvlX+oOX8hGD+wnsjZW1g==",
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"vglB8G4IyL31vnt84A0V78+OkOPOu7",  # 30 bytes
-        expect=b"cwkHO4B+1mmdlvoaBccMohfDGyxcLFkB087TTuDCMz8=",
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"BveQQwKR3TLa5KWOu4TiWLQIJ9gtYlvf",  # 32 bytes
-        expect=b"j8Pj7gDZngUUrnfqQuRRghLoziHinojv858XgGylnAw=",
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"qTMHczZptvZHAsPCIeYXp03v+K1x76Qvv4",  # 34 bytes
-        expect=b"YYziQk2HHpVdMAe5MYR1P3Dz4x6HVLn/nC3/ofXzVrkZgEikEW7gFZu8Lul8Z90/",
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-]
-
-
-@pytest.mark.parametrize("data", data_to_encrypt)
-def test_encrypt(monkeypatch: pytest.MonkeyPatch, data: Data) -> None:
+def test_encrypt_header(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(kapak.aes, "urandom", lambda n: n * b"\x00")
 
     encrypted_data = b""
-    with BytesIO(data.input) as src, BytesIO() as dst:
-        for _ in kapak.aes.encrypt(src, dst, data.password, data.buffer_size):
+    with BytesIO(b"\x00") as src, BytesIO() as dst:
+        for _ in kapak.aes.encrypt(src, dst, "P@ssw0rd"):
             pass
         encrypted_data = dst.getvalue()
 
@@ -75,7 +39,7 @@ def test_encrypt(monkeypatch: pytest.MonkeyPatch, data: Data) -> None:
 
     salt_size = int.from_bytes(header.read(4), "big")
     salt = header.read(salt_size)
-    assert salt == salt_size * b"\x00"
+    assert salt == kapak.aes.SALT_SIZE * b"\x00"
 
     verifier_size = int.from_bytes(header.read(4), "big")
     _ = header.read(verifier_size)
@@ -88,88 +52,100 @@ def test_encrypt(monkeypatch: pytest.MonkeyPatch, data: Data) -> None:
     reserved_size = int.from_bytes(header.read(4), "big")
     assert reserved_size == 0
 
-    encrypted_data_length = len(encrypted_data[4 + header_length :])
-    assert encrypted_data_length % kapak.aes.AES_BLOCK_SIZE == 0
 
-    assert base64.standard_b64encode(encrypted_data[4 + header_length :]) == data.expect
+def test_encrypt_decrypt(monkeypatch: pytest.MonkeyPatch) -> None:
+    cases = [
+        Data(
+            input=bytes(random.getrandbits(8) for _ in range(12)),
+            password="P@ssw0rd",
+            buffer_size=16,
+        ),
+        Data(
+            input=bytes(random.getrandbits(8) for _ in range(16)),
+            password="P@ssw0rd",
+            buffer_size=16,
+        ),
+        Data(
+            input=bytes(random.getrandbits(8) for _ in range(20)),
+            password="P@ssw0rd",
+            buffer_size=16,
+        ),
+        Data(
+            input=bytes(random.getrandbits(8) for _ in range(32)),
+            password="P@ssw0rd",
+            buffer_size=16,
+        ),
+        Data(
+            input=bytes(random.getrandbits(8) for _ in range(34)),
+            password="P@ssw0rd",
+            buffer_size=16,
+        ),
+    ]
 
-
-data_to_decrypt = [
-    Data(
-        input=b"AAAAbWthcGFrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABBOIB2Sf1bxlU6Lv8t8bRZIAAAAIGDHZk3R4+1yU9A/844W8c3N6Jh491AISA2ZpmQBHISUAAAAAAAAAAChQeWV8Cchmg0sArLzwsek",
-        expect=b"yFwMtWN+oqXlKi",  # 14 bytes
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"AAAAbWthcGFrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABBOIB2Sf1bxlU6Lv8t8bRZIAAAAIGDHZk3R4+1yU9A/844W8c3N6Jh491AISA2ZpmQBHISUAAAAAAAAAADeG+Vf6g5fyEYP7CeyNlbW",
-        expect=b"ElOTSoqLIEg7KygP",  # 16 bytes
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"AAAAbWthcGFrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABBOIB2Sf1bxlU6Lv8t8bRZIAAAAIGDHZk3R4+1yU9A/844W8c3N6Jh491AISA2ZpmQBHISUAAAAAAAAAABzCQc7gH7WaZ2W+hoFxwyiF8MbLFwsWQHTztNO4MIzPw==",
-        expect=b"vglB8G4IyL31vnt84A0V78+OkOPOu7",  # 30 bytes
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"AAAAbWthcGFrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABBOIB2Sf1bxlU6Lv8t8bRZIAAAAIGDHZk3R4+1yU9A/844W8c3N6Jh491AISA2ZpmQBHISUAAAAAAAAAACPw+PuANmeBRSud+pC5FGCEujOIeKeiO/znxeAbKWcDA==",
-        expect=b"BveQQwKR3TLa5KWOu4TiWLQIJ9gtYlvf",  # 32 bytes
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-    Data(
-        input=b"AAAAbWthcGFrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABBOIB2Sf1bxlU6Lv8t8bRZIAAAAIGDHZk3R4+1yU9A/844W8c3N6Jh491AISA2ZpmQBHISUAAAAAAAAAABhjOJCTYcelV0wB7kxhHU/cPPjHodUuf+cLf+h9fNWuRmASKQRbuAVm7wu6Xxn3T8=",
-        expect=b"qTMHczZptvZHAsPCIeYXp03v+K1x76Qvv4",  # 34 bytes
-        password="P@ssw0rd",
-        buffer_size=16,
-    ),
-]
-
-
-@pytest.mark.parametrize("data", data_to_decrypt)
-def test_decrypt(monkeypatch: pytest.MonkeyPatch, data: Data) -> None:
     monkeypatch.setattr(kapak.aes, "urandom", lambda n: n * b"\x00")
-    monkeypatch.setattr(kapak.aes, "__version__", "0.0.0")
 
-    decrypted_data = b""
-    with BytesIO(base64.standard_b64decode(data.input)) as src, BytesIO() as dst:
-        for _ in kapak.aes.decrypt(src, dst, data.password, data.buffer_size):
-            pass
-        decrypted_data = dst.getvalue()
+    for c in cases:
+        encrypted_data = b""
+        with BytesIO(c.input) as src, BytesIO() as dst:
+            for _ in kapak.aes.encrypt(src, dst, c.password, c.buffer_size):
+                pass
+            encrypted_data = dst.getvalue()
 
-    assert decrypted_data == data.expect
+        header_length = int.from_bytes(encrypted_data[:4], "big")
+
+        encrypted_data_length = len(encrypted_data[4 + header_length :])
+        assert encrypted_data_length % kapak.aes.AES_BLOCK_SIZE == 0
+        assert encrypted_data_length >= len(c.input)
+
+        decrypted_data = b""
+        with BytesIO(encrypted_data) as src, BytesIO() as dst:
+            for _ in kapak.aes.decrypt(src, dst, c.password, c.buffer_size):
+                pass
+            decrypted_data = dst.getvalue()
+
+        assert decrypted_data == c.input
 
 
 def test_decrypt_wrong_password(monkeypatch: pytest.MonkeyPatch) -> None:
     data = Data(
-        input=b"AAAAbWthcGFrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABBOIB2Sf1bxlU6Lv8t8bRZIAAAAIGDHZk3R4+1yU9A/844W8c3N6Jh491AISA2ZpmQBHISUAAAAAAAAAAChQeWV8Cchmg0sArLzwsek",
-        expect=b"yFwMtWN+oqXlKi",  # 14 bytes
-        password="Wr0ngP@ssw0rd",
+        input=bytes(random.getrandbits(8) for _ in range(12)),
+        password="P@ssw0rd",
         buffer_size=16,
     )
 
     monkeypatch.setattr(kapak.aes, "urandom", lambda n: n * b"\x00")
-    monkeypatch.setattr(kapak.aes, "__version__", "0.0.0")
 
-    with BytesIO(base64.standard_b64decode(data.input)) as src, BytesIO() as dst:
+    encrypted_data = b""
+    with BytesIO(data.input) as src, BytesIO() as dst:
+        for _ in kapak.aes.encrypt(src, dst, data.password, data.buffer_size):
+            pass
+        encrypted_data = dst.getvalue()
+
+    with BytesIO(encrypted_data) as src, BytesIO() as dst:
         with pytest.raises(KapakError, match=r"wrong password"):
-            for _ in kapak.aes.decrypt(src, dst, data.password, data.buffer_size):
+            for _ in kapak.aes.decrypt(src, dst, "Wr0ngP@ssw0rd", data.buffer_size):
                 pass
 
 
 def test_decrypt_unmatching_version(monkeypatch: pytest.MonkeyPatch) -> None:
     data = Data(
-        input=b"AAAAbWthcGFrAAAnDwAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABBOIB2Sf1bxlU6Lv8t8bRZIAAAAIGDHZk3R4+1yU9A/844W8c3N6Jh491AISA2ZpmQBHISUAAAAAAAAAAChQeWV8Cchmg0sArLzwsek",
-        expect=b"yFwMtWN+oqXlKi",  # 14 bytes
+        input=bytes(random.getrandbits(8) for _ in range(16)),
         password="P@ssw0rd",
         buffer_size=16,
     )
 
     monkeypatch.setattr(kapak.aes, "urandom", lambda n: n * b"\x00")
+    monkeypatch.setattr(kapak.aes, "__version__", "0.0.0")
 
-    with BytesIO(base64.standard_b64decode(data.input)) as src, BytesIO() as dst:
+    encrypted_data = b""
+    with BytesIO(data.input) as src, BytesIO() as dst:
+        for _ in kapak.aes.encrypt(src, dst, data.password, data.buffer_size):
+            pass
+        encrypted_data = dst.getvalue()
+
+    monkeypatch.setattr(kapak.aes, "__version__", "1.0.0")
+
+    with BytesIO(encrypted_data) as src, BytesIO() as dst:
         with pytest.raises(
             KapakError,
             match=r"source version does not match the current version of Kapak",
@@ -179,18 +155,12 @@ def test_decrypt_unmatching_version(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_decrypt_random_data(monkeypatch: pytest.MonkeyPatch) -> None:
-    data = Data(
-        input=b"cmFuZG9tIGRhdGE=",
-        expect=b"",
-        password="",
-        buffer_size=0,
-    )
-
     monkeypatch.setattr(kapak.aes, "urandom", lambda n: n * b"\x00")
 
-    with BytesIO(base64.standard_b64decode(data.input)) as src, BytesIO() as dst:
+    rand_bytes = bytes(random.getrandbits(8) for _ in range(16))
+    with BytesIO(rand_bytes) as src, BytesIO() as dst:
         with pytest.raises(KapakError, match=r"not able to decrypt this file format"):
-            for _ in kapak.aes.decrypt(src, dst, data.password):
+            for _ in kapak.aes.decrypt(src, dst, ""):
                 pass
 
 

@@ -19,6 +19,17 @@ VERIFIER_SIZE = 16
 VERIFIER_HASH_SIZE = 32
 
 
+class Header:
+    def __init__(self, header: bytes) -> None:
+        self.header = header
+        self._cursor = 0
+
+    def read(self, length: int) -> bytes:
+        current_position = self._cursor
+        self._cursor += length
+        return self.header[current_position : self._cursor]
+
+
 def encrypt(
     src: BinaryIO, dst: BinaryIO, password: str, buffer_size: int = BUFFER_SIZE
 ) -> Generator[int, None, None]:
@@ -62,28 +73,22 @@ def encrypt(
         + reserved_size
     )
     header_length = len(header).to_bytes(4, "big")
-    header = header_length + header
 
-    dst.write(header)
+    dst.write(header_length + header)
 
+    buffer_ = b""
     for chunk in iter(partial(src.read, buffer_size), b""):
-        chunk_len = len(chunk)
-        chunk = _pad_bytes(chunk)
-        chunk = encryptor.update(chunk)
-        dst.write(chunk)
-        yield chunk_len
+        if buffer_ == b"":
+            buffer_ = chunk
+            continue
+        dst.write(encryptor.update(buffer_))
+        yield len(buffer_)
+        buffer_ = chunk
+
+    # Pad then encrypt last chunk
+    dst.write(encryptor.update(_pad(buffer_)))
     dst.write(encryptor.finalize())
-
-
-class Header:
-    def __init__(self, header: bytes) -> None:
-        self.header = header
-        self._cursor = 0
-
-    def read(self, length: int) -> bytes:
-        current_position = self._cursor
-        self._cursor += length
-        return self.header[current_position : self._cursor]
+    yield len(buffer_)
 
 
 def decrypt(
@@ -125,27 +130,26 @@ def decrypt(
     if sha256(verifier).digest() != verifier_hash:
         raise KapakError("wrong password")
 
+    buffer_ = b""
     for chunk in iter(partial(src.read, buffer_size), b""):
-        chunk_len = len(chunk)
-        chunk = decryptor.update(chunk)
-        chunk = _unpad_bytes(chunk)
-        dst.write(chunk)
-        yield chunk_len
+        if buffer_ == b"":
+            buffer_ = chunk
+            continue
+        dst.write(decryptor.update(buffer_))
+        yield len(buffer_)
+        buffer_ = chunk
+
+    # Decrypt then unpad last chunk
+    dst.write(_unpad(decryptor.update(buffer_)))
     dst.write(decryptor.finalize())
+    yield len(buffer_)
 
 
-def _pad_bytes(bytes_in: bytes) -> bytes:
-    if len(bytes_in) % AES_BLOCK_SIZE == 0:
-        return bytes_in
+def _pad(bytes_in: bytes) -> bytes:
     padder = padding.PKCS7(AES_BLOCK_SIZE * 8).padder()
-    padded: bytes = padder.update(bytes_in) + padder.finalize()
-    return padded
+    return padder.update(bytes_in) + padder.finalize()
 
 
-def _unpad_bytes(bytes_in: bytes) -> bytes:
+def _unpad(bytes_in: bytes) -> bytes:
     unpadder = padding.PKCS7(AES_BLOCK_SIZE * 8).unpadder()
-    try:
-        unpadded: bytes = unpadder.update(bytes_in) + unpadder.finalize()
-        return unpadded
-    except ValueError:
-        return bytes_in
+    return unpadder.update(bytes_in) + unpadder.finalize()
