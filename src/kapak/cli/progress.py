@@ -1,5 +1,4 @@
 import sys
-from math import floor
 
 
 class Progress:
@@ -31,7 +30,7 @@ class Progress:
             return
         self._progress += chunk_len
         percentage = int(self._progress / self._total * 100)
-        i = floor(percentage / 10)
+        i = percentage // 10
         sys.stderr.write(f"\r{self._space}\r{self._bar[i]} {percentage}%")
         if i == 10:
             sys.stderr.write("\n")
