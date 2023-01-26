@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.0.0-rc.2]
+
+### Added
+
+- Added more test coverage
+
+### Fixed
+
+- Fixed issue with padding
+
 ## [4.0.0-rc.1]
 
 ### Added

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kapak"
-version = "4.0.0-rc.1"
+version = "4.0.0-rc.2"
 description = "A simple-to-use file encryption script"
 authors = ["Amis Shokoohi <amisshokoohi@gmail.com>"]
 license = "Apache-2.0"
