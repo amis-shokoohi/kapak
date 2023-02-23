@@ -1,6 +1,11 @@
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/24605263/214285260-80aed843-17e6-4a2f-98bf-bfb21f900dff.png">
-</p>
+<div align="center">
+  <img
+    src="https://user-images.githubusercontent.com/24605263/214285260-80aed843-17e6-4a2f-98bf-bfb21f900dff.png"
+    alt="kapak - A simple-to-use file encryption script"
+  >
+</div>
+
+<div align="center">
 
 [![tests](https://github.com/amis-shokoohi/kapak/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/amis-shokoohi/kapak/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/amis-shokoohi/kapak/branch/main/graph/badge.svg?token=6W2V3QOZKP)](https://codecov.io/gh/amis-shokoohi/kapak)
@@ -10,9 +15,13 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/amis-shokoohi/kapak)
 ![GitHub forks](https://img.shields.io/github/forks/amis-shokoohi/kapak)
 
-# kapak: A simple-to-use file encryption script
+</div>
 
-- [Description](#description)
+**Kapak** is a simple-to-use **file encryption** script/library.<br>
+It uses `AES_256_CBC` as its encryption cipher.
+
+> If you are wondering what _kapak_ means, it means _mold_.
+
 - [Installation](#installation)
 - [CLI Usage](#cli-usage)
   - [Encrypt file](#cli-usage-encrypt-file)
@@ -21,20 +30,13 @@
 - [Integration](#integration)
   - [Encrypt file](#integration-encrypt-file)
   - [Encrypt stdin](#integration-encrypt-stdin)
-
-<span id="description"></span>
-
-## Description
-
-Kapak is a simple-to-use **file encryption** script.<br>
-It uses `AES_256_CBC` as its encryption cipher and <br>
-`scrypt` key derivation algorithm to generate a 256 bit key.
-
-> If you are wondering what _kapak_ means, it means _mold_.
+  - [Encrypt anything](#integration-encrypt-anything)
 
 <span id="installation"></span>
 
 ## Installation
+
+Installing with `pip`:
 
 ```
 pip install kapak
@@ -156,12 +158,11 @@ with input_file.open("rb") as src, output_file.open("wb") as dst:
 ### Encrypt stdin
 
 ```py
-import io
 import sys
-import base64
+from io import BytesIO
 from kapak.aes import encrypt
 
-with io.BytesIO() as dst:
+with BytesIO() as dst:
     for _ in encrypt(
         src=sys.stdin.buffer,
         dst=dst,
@@ -170,6 +171,27 @@ with io.BytesIO() as dst:
     ):
         pass
     encrypted_data = dst.getvalue()
-    encrypted_data_base64 = base64.standard_b64encode(encrypted_data)
-    print(encrypted_data_base64.decode("utf-8"))
+    print(encrypted_data.hex())
+```
+
+<span id="integration-encrypt-anything"></span>
+
+### Encrypt anything
+
+```py
+from io import BytesIO
+from kapak.aes import encrypt
+
+anything = b"anything"
+
+with BytesIO(anything) as src, BytesIO() as dst:
+    for _ in encrypt(
+        src=src,
+        dst=dst,
+        password="P@ssw0rd",
+        buffer_size=1024
+    ):
+        pass
+    encrypted_data = dst.getvalue()
+    print(encrypted_data.hex())
 ```

@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.0.0]
+
+### Changed
+
+- `1ba75a5` Bumped cryptography from 39.0.0 to 39.0.1
+
 ## [4.0.0-rc.2]
 
 ### Added
