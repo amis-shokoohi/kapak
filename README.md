@@ -12,6 +12,7 @@
 ![GitHub](https://img.shields.io/github/license/amis-shokoohi/kapak)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/amis-shokoohi/kapak/main)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/amis-shokoohi/kapak)
+[![Downloads](https://static.pepy.tech/personalized-badge/kapak?period=total&units=abbreviation&left_color=blue&right_color=grey&left_text=Downloads)](https://pepy.tech/project/kapak)
 ![GitHub Repo stars](https://img.shields.io/github/stars/amis-shokoohi/kapak)
 ![GitHub forks](https://img.shields.io/github/forks/amis-shokoohi/kapak)
 
