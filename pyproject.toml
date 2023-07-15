@@ -23,7 +23,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-cryptography = "^39.0.0"
+cryptography = ">=39,<42"
 
 [tool.poetry.dev-dependencies]
 black = "^22.12.0"
