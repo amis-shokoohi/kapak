@@ -43,5 +43,5 @@ def test_parse() -> None:
         ),
     ]
 
-    for (input, expect) in cases:
+    for input, expect in cases:
         assert parse(input) == expect

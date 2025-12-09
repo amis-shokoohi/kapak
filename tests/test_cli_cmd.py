@@ -52,7 +52,7 @@ def test_run_print(capsys: pytest.CaptureFixture) -> None:
         ),
     ]
 
-    for (input, expect) in cases:
+    for input, expect in cases:
         kapak.cli.cmd.run(input)
 
         captured = capsys.readouterr()
