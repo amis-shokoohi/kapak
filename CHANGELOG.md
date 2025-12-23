@@ -1,10 +1,21 @@
 # Changelog
 
+# [4.0.1]
+
+### Fixed
+
+- Check reserved bytes in file header and show better error message while decrypting ([1fe7178](https://github.com/amis-shokoohi/kapak/commit/1fe71782a189177288e59f0d803925bddc6181b1))
+
+### Changed
+
+- Updated dependencies to latest versions ([feada0c](https://github.com/amis-shokoohi/kapak/commit/feada0c2c454d650ac34bbaa69e899b5acdb3f49))
+- Minimum officially supported version is now Python 3.10
+
 ## [4.0.0]
 
 ### Changed
 
-- `1ba75a5` Bumped cryptography from 39.0.0 to 39.0.1
+- Bumped cryptography from 39.0.0 to 39.0.1
 
 ## [4.0.0-rc.2]
 
