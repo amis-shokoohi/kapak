@@ -133,10 +133,14 @@ def decrypt(
     # Check reserved bytes
     reserved_size = int.from_bytes(header.read(4), "big")
     if reserved_size != 0:
-        raise KapakError("this file uses features not supported in current version of Kapak. Please update to the latest version.")
+        raise KapakError(
+            "this file uses features not supported in current version of Kapak. Please update to the latest version."
+        )
     reserved_size = int.from_bytes(header.read(4), "big")
     if reserved_size != 0:
-        raise KapakError("this file uses features not supported in current version of Kapak. Please update to the latest version.")
+        raise KapakError(
+            "this file uses features not supported in current version of Kapak. Please update to the latest version."
+        )
 
     buffer_ = b""
     for chunk in iter(partial(src.read, buffer_size), b""):
