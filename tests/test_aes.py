@@ -181,3 +181,63 @@ def test_decrypt_wrong_buffer_size() -> None:
         ):
             for _ in kapak.aes.decrypt(src, dst, "", wrong_buffer_size):
                 pass
+
+
+def test_decrypt_non_zero_reserved_field(monkeypatch: pytest.MonkeyPatch) -> None:
+    data = Data(
+        input=bytes(random.getrandbits(8) for _ in range(16)),
+        password="P@ssw0rd",
+        buffer_size=16,
+    )
+
+    monkeypatch.setattr(kapak.aes, "urandom", lambda n: n * b"\x00")
+
+    encrypted_data = b""
+    with BytesIO(data.input) as src, BytesIO() as dst:
+        for _ in kapak.aes.encrypt(src, dst, data.password, data.buffer_size):
+            pass
+        encrypted_data = dst.getvalue()
+
+    header_length = int.from_bytes(encrypted_data[:4], "big")
+
+    test_data = b"test"  # Test data to be inserted into reserved fields
+
+    # Test first reserved field
+    first_reserved_offset = (
+        4 + header_length - 8
+    )  # header_size + header - reserved_size(4 bytes) * 2
+    modified_encrypted_data_1 = (
+        int(header_length + len(test_data)).to_bytes(4, "big")  # Update header length
+        + encrypted_data[4:first_reserved_offset]
+        + int(len(test_data)).to_bytes(4, "big")
+        + test_data
+        + encrypted_data[first_reserved_offset + 4 :]
+    )
+
+    with BytesIO(modified_encrypted_data_1) as src, BytesIO() as dst:
+        with pytest.raises(
+            KapakError,
+            match=r"this file uses features not supported in current version of Kapak",
+        ):
+            for _ in kapak.aes.decrypt(src, dst, data.password, data.buffer_size):
+                pass
+
+    # Test first reserved field
+    second_reserved_offset = (
+        4 + header_length - 4
+    )  # header_size + header - reserved_size(4 bytes)
+    modified_encrypted_data_2 = (
+        int(header_length + len(test_data)).to_bytes(4, "big")  # Update header length
+        + encrypted_data[4:second_reserved_offset]
+        + int(len(test_data)).to_bytes(4, "big")
+        + test_data
+        + encrypted_data[second_reserved_offset + 4 :]
+    )
+
+    with BytesIO(modified_encrypted_data_2) as src, BytesIO() as dst:
+        with pytest.raises(
+            KapakError,
+            match=r"this file uses features not supported in current version of Kapak",
+        ):
+            for _ in kapak.aes.decrypt(src, dst, data.password, data.buffer_size):
+                pass
